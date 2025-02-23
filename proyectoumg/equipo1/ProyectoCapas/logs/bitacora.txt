@@ -1,0 +1,65 @@
+
+ - Ingreso usuario : Mishel
+ - Facultad Eliminada: Ingenieria Forence | Codigo: 3
+ - Facultad Eliminada: Ingenieeria Fisica | Codigo: 4
+ - Facultad Eliminada: INGENIERIA EN SISTEMAS Y CIENCIAS DE LA COMPU | Codigo: 5
+ - Ingreso usuario : Mishel
+ - Ingreso usuario : Mishel
+ - Ingreso usuario : 
+ - Ingreso usuario : Mishel
+ - Ingreso usuario : admin
+ - Ingreso usuario : Mishel
+ - Ingreso usuario : Mishel
+ - Maestro Modificado: DITHER CAL | Codigo: 9985
+ - Maestro Registrado: DITHER CAL
+ - Nuevo alumno registrado: Mishel Loeiza
+ - Ingreso usuario : Mishel
+ - alumno Modificado: Mishel Loeiza | Carnet: 9962
+ -  alumno eliminado: Mishel Loeiza | Carnet: 9962
+ - Ingreso usuario : Mishel
+ -  alumno eliminado: Mishel Loeiza | Carnet: 9963
+ -  alumno eliminado: Mishel Loeiza | Carnet: 9964
+ -  alumno eliminado: Mishel Loeiza | Carnet: 9965
+ - Ingreso usuario : Mishel
+ -  alumno eliminado: Mishel Loeiza | Carnet: 9966
+ - Ingreso usuario : Mishel
+ -  alumno eliminado: Mishel Loeiza | Carnet: 9967
+ - Ingreso usuario : Mishel
+ - Nuevo alumno registrado: Dayana
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ -  alumno eliminado: Dayana | Carnet: 9969
+ - sede Registrada: Cu
+ - Sede Eliminada: Cu | Codigo: 9977
+ - Maestro Registrado: loo
+ - Maestro Eliminado: loo | Codigo: 9987
+ - Seccion Registrada: 4
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Seccion Modificada: 4 | Codigo: 17
+ - Seccion Registrada: 3
+ - Seccion Eliminada: 4 | Codigo: 17
+ - Ingreso usuario : Mishel
+ -  alumno eliminado: Dayana | Carnet: 9969
+ - Ingreso usuario : Mishel
+ - Sede Eliminada: Chimaltenango | Codigo: 9976
+ - Curso Registrado: 5
+ - Curso Eliminado: 5 | Codigo: 6
