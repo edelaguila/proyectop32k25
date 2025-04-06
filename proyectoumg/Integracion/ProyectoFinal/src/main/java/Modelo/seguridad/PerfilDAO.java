@@ -169,5 +169,9 @@ public class PerfilDAO {
 
         return perfil; 
     }
+
+    public int obtenerIdPorNombre(String perfilSeleccionado) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
         
 }

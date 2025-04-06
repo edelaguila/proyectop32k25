@@ -36,7 +36,7 @@ public class MantenimientoBitacora extends javax.swing.JInternalFrame {
     public void llenadoDeCombos() {
 
     }
-
+//G
  public void llenadoDeTablas() {
         DefaultTableModel modelo = new DefaultTableModel();
         modelo.addColumn("ID ");
@@ -62,7 +62,7 @@ public class MantenimientoBitacora extends javax.swing.JInternalFrame {
             modelo.addRow(dato);
         }
     }
-
+//R
     public void buscaraplicacion() {
 
     }
