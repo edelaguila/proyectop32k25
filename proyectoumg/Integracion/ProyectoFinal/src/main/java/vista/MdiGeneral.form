@@ -117,63 +117,6 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="MenuGeneralSeguridad1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="BANCOS"/>
-          </Properties>
-          <SubComponents>
-            <Menu class="javax.swing.JMenu" name="MenuMantenimientos1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Mantenimientos"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MenuMantenimientos1ActionPerformed"/>
-              </Events>
-              <SubComponents>
-                <MenuItem class="javax.swing.JMenuItem" name="MantenimientoBancos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mantenimiento Bancos"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MantenimientoBancosActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="MantenimientoTipo_cuenta">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mantenimiento Tipo de Cuenta"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MantenimientoTipo_cuentaActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="MantenimientoTipoOperacionBancaria">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mantenimiento Tipo de operaci&#xf2;n bancaria"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MantenimientoTipoOperacionBancariaActionPerformed"/>
-                  </Events>
-                </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="MantenimientoTipoMoneda">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mantenimiento Tipo de Moneda"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MantenimientoTipoMonedaActionPerformed"/>
-                  </Events>
-                </MenuItem>
-              </SubComponents>
-            </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="salirSistema1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Salir del Sistema"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="salirSistema1ActionPerformed"/>
-              </Events>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
       </SubComponents>
     </Menu>
   </NonVisualComponents>
