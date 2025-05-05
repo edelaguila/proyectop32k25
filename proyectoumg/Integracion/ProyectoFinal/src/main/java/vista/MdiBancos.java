@@ -16,6 +16,7 @@ import vista.bancos.MantenimientoBancos;
 import vista.bancos.MantenimientoTipo_moneda;
 import vista.bancos.MantenimientoTipo_operacion_bancaria;
 import vista.bancos.MantenimientoTasa_cambio_diario;
+import vista.bancos.MantenimientoTipo_cuenta;
 import vista.bancos.MantenimientoTipo_pago;
 import vista.seguridad.MantenimientoUsuario;
 import vista.seguridad.MantenimientoPerfiles;
@@ -391,25 +392,27 @@ public class MdiBancos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        // Cierra todas las ventanas internas abiertas
-       // for (javax.swing.JInternalFrame frame : jDesktopPane1.getAllFrames()) {
-        //    frame.dispose();
-        //}
+// Cierra todas las ventanas internas abiertas
+for (javax.swing.JInternalFrame frame : jDesktopPane1.getAllFrames()) {
+    frame.dispose();
+}
 
-        // Crea y muestra la nueva ventana
-        //Tipo_de_cuenta ventana = new Tipo_de_cuenta();
-       // jDesktopPane1.add(ventana);
+// Crea y muestra la nueva ventana
+MantenimientoTipo_cuenta ventana = new MantenimientoTipo_cuenta();
+jDesktopPane1.add(ventana);
+ventana.setVisible(true); // Primero mostrar
 
-        // Centra la ventana dentro del JDesktopPane
-        //Dimension desktopSize = jDesktopPane1.getSize();
-        //Dimension FrameSize = ventana.getSize();
-        //ventana.setLocation(
-            //(desktopSize.width - FrameSize.width) / 2,
-            //(desktopSize.height - FrameSize.height) / 2
-       // );
+// Asegúrate de que el tamaño esté establecido antes de centrar
+ventana.pack(); // O usa ventana.setSize(ancho, alto) 
 
-        //ventana.setVisible(true); // 
+// Ahora céntralo
+Dimension desktopSize = jDesktopPane1.getSize();
+Dimension frameSize = ventana.getSize();
+ventana.setLocation(
+    (desktopSize.width - frameSize.width) / 2,
+    (desktopSize.height - frameSize.height) / 2
+);
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
