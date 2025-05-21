@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+//Importando paquetes y archivos a utilizar
 package vista.compras_cxp;
 import Controlador.compras_cxp.Metododepago;
 import Modelo.compras_cxp.MetododepagoDAO;
@@ -17,55 +18,84 @@ import Controlador.seguridad.UsuarioConectado;
  *
  * @author visitante
  */
-//Mantenimiento Vista Metodo de Pago implementado por Alisson López
+        //Mantenimiento Vista Metodo de Pago implementado por Alisson López
+
+//Declaracion de la clase Matenimiento metodo de pago
 public class MantenimientoMetododePago extends javax.swing.JInternalFrame {
     
+    //Representacion del codigo de la aplicacion 
     final int APLICACION=203;
-
+    
+    //Metodo para el llenado de combo box con los metodos de pago que existen
     public void llenadoDeCombos() {
+        //Instancia de la clase metododepagoDAO
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        //Se obtiene la lista de los metodos de pago 
         List<Metododepago> metododepagos = metododepagoDAO.select();
+        //Mensaje al usuario
         cbox_empleado.addItem("Seleccione una opción");
+        //Ciclo para recorrer y añade cada metodo de pago al combo box
         for (int i = 0; i < metododepagos.size(); i++) {
             cbox_empleado.addItem(metododepagos.get(i).getNombreMetodoPago());
         }
     }
-
+    
+    //Metodo para el lleando de las tablas 
     public void llenadoDeTablas() {
+        //Nuevo modelo para la tabla 
         DefaultTableModel modelo = new DefaultTableModel();
+        //Añadiendo columna id de metodo de pago
         modelo.addColumn("ID Metodo de Pago");
+        //Añadiendo columna nombre del metodo de pago
         modelo.addColumn("Nombre Metodo de Pago");
+        //Añadiendo columna del estatus del metodo de pago
         modelo.addColumn("Estatus");
+        // Creación del DAO para acceder a los datos de métodos de pago
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        //Se obtiene la lista de los metodos de pago
         List<Metododepago> metododepago = metododepagoDAO.select();
+        //Estableciendo el modelo en la tabla de vendedores
         tablaVendedores.setModel(modelo);
+        // Arreglo temporal para almacenar los datos de cada fila
         String[] dato = new String[3];
+        //Ciclo que recorre la lista obtenida y agrega cada uno a la tabla
         for (int i = 0; i < metododepago.size(); i++) {
             dato[0] = Integer.toString(metododepago.get(i).getId_metodoPago());
             dato[1] = metododepago.get(i).getNombreMetodoPago();
             dato[2] = metododepago.get(i).getEstatusMetodoPago();
             //System.out.println("vendedor:" + vendedores);
+            //Agrega la fila al modelo
             modelo.addRow(dato);
         }
     }
-
+    //Metodo para buscar el metodo de pago
     public void buscarMetododepago() {
+        
+        // Consulta de datos de un método de pago por ID
         Metododepago metodoAConsultar = new Metododepago();
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        // Establece el ID a consultar a partir del texto ingresado en txtbuscado
         metodoAConsultar.setId_metodoPago(Integer.parseInt(txtbuscado.getText()));
+        // Realiza la consulta a la base de datos y obtiene los datos del método de pago
         metodoAConsultar = metododepagoDAO.query(metodoAConsultar);
+        //Muestra los datos obtenidos
         txtNombre.setText(metodoAConsultar.getNombreMetodoPago());
         txtDireccion.setText(metodoAConsultar.getEstatusMetodoPago());
         
+        //Registro insertado en Bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Consulta Datos MetodoDePago");
     }
-
+    
+    // Constructor del formulario MantenimientoMetododePago
     public MantenimientoMetododePago() {
+        //inicializacion de los componentes graficos
         initComponents();
+        //Llamado al metodo de llenado de tablas
         llenadoDeTablas();
+        //Llamado al metodo de llenado de los combo box
         llenadoDeCombos();
     }
 
@@ -319,55 +349,81 @@ public class MantenimientoMetododePago extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    //Boton para eliminar un metodo de pago
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // TODO add your handling code here:
+        //Instancia del metodo de pago y su dao
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        //Se crea un objeto del metodo de pago
         Metododepago metodoAEliminar = new Metododepago();
+        //Se obtiene el valor del txt y se establece al objeto
         metodoAEliminar.setId_metodoPago(Integer.parseInt(txtbuscado.getText()));
+        //eliminar el metodo de pago a eliminar
         metododepagoDAO.delete(metodoAEliminar);
+        //Llamado de el metodo del llenado de tabla
         llenadoDeTablas();
+        //Registro insertado en la bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Borrar Datos MetodoDePago");
     }//GEN-LAST:event_btnEliminarActionPerformed
-
+    
+    //Boton para registrar un metodo de pago
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+        //Instacia del metodo de pagoDAO
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        //Se crea un nuevo objeto
         Metododepago metodoAInsertar = new Metododepago();
+        //Se estableceren los valores
         metodoAInsertar.setNombreMetodoPago(txtNombre.getText());
         metodoAInsertar.setEstatusMetodoPago(txtDireccion.getText());
+        //Se inserta el nuevo metodo de pago
         metododepagoDAO.insert(metodoAInsertar);
+        
+        //Se registra en la bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Ingreso Datos MetodoDePego");
+        //Llamado al metodo de llenado de tablas
         llenadoDeTablas();
         
     }//GEN-LAST:event_btnRegistrarActionPerformed
-
+    
+    //Boton buscar metodo de pago
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         // TODO add your handling code here:
+        //llamadp al metodo para buscar un metodo de pago
         buscarMetododepago();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-//        // TODO add your handling code here:
+        //Instacia del metodo de pagodao
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        //Se crea un nuevo objeto
         Metododepago metodoAActualizar = new Metododepago();
+        
+        //se actualizan los valores a los txt
         metodoAActualizar.setId_metodoPago(Integer.parseInt(txtbuscado.getText()));
         metodoAActualizar.setNombreMetodoPago(txtNombre.getText());
         metodoAActualizar.setEstatusMetodoPago(txtDireccion.getText());
+        
+        //Actualizacion de la informacion en la base de datos
         metododepagoDAO.update(metodoAActualizar);
+        
+        //Llamado al metodo de llenado de tablas
         llenadoDeTablas();
+        
+        //Se registra en la bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Actualizacion Datos MetodoDePago");
     }//GEN-LAST:event_btnModificarActionPerformed
-
+    //Boton para limpiar los textfields
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        //Se limpia los datos ingresados
         cbox_empleado.setSelectedIndex(0);
         txtNombre.setText("");
         txtDireccion.setText("");
@@ -383,46 +439,54 @@ public class MantenimientoMetododePago extends javax.swing.JInternalFrame {
 
         // TODO add your handling code here:
     }//GEN-LAST:event_cbox_empleadoActionPerformed
-
+    
+    //Boton ayuda
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // Ayuda Implementada por Alisson López
+                              // Ayuda Implementada por Alisson López
        try {
+           //Verificacion si el archivo de ayuda existe
             if ((new File("src\\main\\java\\ayudas\\ayudasComprasyCuentasPorPagar.chm")).exists()) {
                 Process p = Runtime
                         .getRuntime()
                         .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\ayudasComprasyCuentasPorPagar.chm");
                 p.waitFor();
             } else {
+                //Muestra mensaje en consola si no se encuentra el archivo de ayuda
                 System.out.println("La ayuda no Fue encontrada");
             }
             System.out.println("Correcto");
         } catch (Exception ex) {
+            // En caso de error, imprime la traza para diagnóstico
             ex.printStackTrace();
         }  
     }//GEN-LAST:event_jButton2ActionPerformed
-
+    
     private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNombreActionPerformed
 
-    public void habilitarEliminar(boolean habilitado) {
+    //Metodo para habilitar el boton eliminar
+     public void habilitarEliminar(boolean habilitado) {
         btnEliminar.setEnabled(habilitado);
     }
-    
+    //Metodo para habilitar el boton registrar
     public void habilitarRegistrar(boolean habilitado) {
         btnRegistrar.setEnabled(habilitado);
     }
-    
+    //Metodo para habilitar el boton buscar
     public void habilitarBuscar(boolean habilitado) {
         Reporte.setEnabled(habilitado);
     }
-    
+    //Metodo para habilitar el boton modificar
     public void habilitarModificar(boolean habilitado) {
         btnModificar.setEnabled(habilitado);
     }
     
+    //Boton para realizar reportes
     private void ReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReporteActionPerformed
+        //Instancia del metododepagodao
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
+        //Llamado al metodo de imprimir reporte
         metododepagoDAO.imprimirReporte(); 
     }//GEN-LAST:event_ReporteActionPerformed
 

@@ -1,3 +1,4 @@
+//Declaracion del paquete vista compras.cxp
 package vista.compras_cxp;
 
 /*
@@ -5,7 +6,7 @@ package vista.compras_cxp;
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
 
-
+//Importaciones de archivos a utilizar
 import Modelo.Conexion;
 import Modelo.compras_cxp.ProveedorDAO;
 import Modelo.compras_cxp.Compras_cppDAO;
@@ -21,13 +22,11 @@ import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JLabel;
-
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
@@ -35,9 +34,11 @@ import javax.swing.JTable;
  *
  * @author oscar
  */
+
+//Declaracion de la clase compras
 public class Compras extends javax.swing.JInternalFrame {
-    // Despliegue de id proveedor en combobox ----- HECHO POR KATHIA CONTRERAS 8246
-         public void llenadoDeCombos() {
+        // Despliegue de id proveedor en combobox ----- HECHO POR KATHIA CONTRERAS 8246
+        public void llenadoDeCombos() {
         // instancia de ProveedorDAO
         ProveedorDAO proveedorDAO = new ProveedorDAO();
         //manda con select a una lista todos los proveedores.
@@ -48,7 +49,8 @@ public class Compras extends javax.swing.JInternalFrame {
             idproveedor.addItem(String.valueOf(proveedores.get(i).getId_proveedor()));
         }
         
-        //Kathia Contreras llenado de productos disponibles para la lista #1
+                    //Kathia Contreras llenado de productos disponibles para la lista #1
+                    
         ProductosDAO productosDAO = new ProductosDAO();//crea objeto 
         List<productos> producto = productosDAO.select(); //crea una lista
          DefaultListModel<String> modelo = new DefaultListModel<>();//crea un modelo para la lista
@@ -58,7 +60,9 @@ public class Compras extends javax.swing.JInternalFrame {
         listaproductos.setModel(modelo);//manda el modelo a la lista (visualmente)
 
      
-     //Modificaciones Realizadas por Alisson López al código base de Kathia Contreras
+            //Modificaciones Realizadas por Alisson López al código base de Kathia Contreras
+    
+    
     listaproductos.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
     @Override
     public void valueChanged(ListSelectionEvent e) {
@@ -93,27 +97,46 @@ public class Compras extends javax.swing.JInternalFrame {
     
          
     }
-         
+    //Metodo para llenar la tabla de compras     
     public void llenadoDeTablas() {
-        
+        //Nuevo modelo para la tabla
         DefaultTableModel modelo = new DefaultTableModel();
+        //añadiendo columnas
+        
+        //Columna no.de compra
         modelo.addColumn("No. Compra");
+        //Columna del nombre del comprador
         modelo.addColumn("Nombre");
+        //Columnna del apellido del comprador
         modelo.addColumn("Apellido");
+        //Columnna del id del proveedor
         modelo.addColumn("Id Proveedor");
+        //Columnna del producto comprado
         modelo.addColumn("Producto");
+        //Columnna de la cantidad de productos comprados
         modelo.addColumn("Cantidad");
+        //Columnna del precio del producto a comprar
         modelo.addColumn("Precio");
+        //Columnna del salario anterior
         modelo.addColumn("Salario Anterior");
+        //Colummna del plazo de dias
         modelo.addColumn("Plazo");
+        //Columnna del total
         modelo.addColumn("Total");
        
-    
+        //Crea una instancia del DAO para acceder a los datos de las compras
         Compras_cppDAO compras_cppDAO = new Compras_cppDAO();
+        //Obtieniendo la lista de compras desde la base de datos
         List<Compra_cpp> compras_cpp = compras_cppDAO.select();
+        //Asigna el modelo creado a la tabla visual
         jTable2.setModel(modelo);
+        //Arreglo temporal para almacenar los datos de cada compra
         String[] dato = new String[10];
+        
+        //Ciclo que Recorre la lista de compras y llena el modelo con los datos
         for (int i = 0; i < compras_cpp.size(); i++) {
+            
+            //Asignacion de los valores de cada colummna 
             dato[0] = Integer.toString(compras_cpp.get(i).getNo_compra());
             dato[1] = compras_cpp.get(i).getNombre_usuario();
             dato[2] = compras_cpp.get(i).getApellido_usuario();
@@ -125,24 +148,28 @@ public class Compras extends javax.swing.JInternalFrame {
             dato[8] = Integer.toString(compras_cpp.get(i).getPlazo());
             dato[9] = Integer.toString(compras_cpp.get(i).getTotal());
             
-            
+            //Agregando fila al modelo
             modelo.addRow(dato);
-            
           }
-
     }
 
-
-   // Calculo de la suma de la columna total implementado por Alisson López
+                           //Hecho por Alisson López
+    
+   // Calculo de la suma de la columna total implementado 
     public void calcularTotal() {
+        //Almacenador de la suma total
         double sumaTotal = 0.0;
+        //Decision para saber si la tabla esta vacia y que debe de tener almenos una fila
         if (jTable2 != null && jTable2.getRowCount() > 0) {
+            // Obtiene el índice de la última columna (columna Total)
             int columnaTotal = jTable2.getColumnCount() - 1;
-            
+           //Ciclo que recirre cada fila de la tabla
            for (int i = 0; i < jTable2.getRowCount(); i++) {
                try {
+                    // Obtiene el valor de la celda en la columna Total
                    Object valor = jTable2.getValueAt(i, columnaTotal);
-                    if (valor != null) {
+                   //Decision si el valor no es nulo se convierte en double y se suma
+                   if (valor != null) {
                        double valorNumerico = Double.parseDouble(valor.toString());
                       sumaTotal += valorNumerico;
                     }
@@ -151,6 +178,7 @@ public class Compras extends javax.swing.JInternalFrame {
                 }
             }
         }
+        //Imprime el resultado
         resul.setText(String.format("%.2f", sumaTotal));
    }
 
@@ -158,10 +186,13 @@ public class Compras extends javax.swing.JInternalFrame {
 
 
     
-        
+    //Constructor de la clase compras
     public Compras() {
+        //Inicializacion de los objetos visuales
         initComponents();
+        //Llamado del metodo de llenado de combos
         llenadoDeCombos();    
+        //Llamado del metodo de llenado de tablas
         llenadoDeTablas();
         
         
@@ -488,33 +519,45 @@ public class Compras extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    
+    //Cuando se ejecute se selecciona un proveedor en el comboBox
     private void idproveedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idproveedorActionPerformed
+        // Obtiene el ítem seleccionado del comboBox y lo convierte a String
         String seleccionado = (String) idproveedor.getSelectedItem(); //conversion a string
         Proveedor proveedorAConsultar = new Proveedor(); //crea objeto
         ProveedorDAO proveedorDAO = new ProveedorDAO(); //crea objeto
+        //Estableciendo los atributos
         proveedorAConsultar.setId_proveedor(Integer.valueOf(seleccionado)); //toma el id seleccionado
         proveedorAConsultar = proveedorDAO.query(proveedorAConsultar); //realiza una busqueda
         proveedorselec.setText(proveedorAConsultar.getNombre_proveedor());
         saldopen.setText(String.valueOf(proveedorAConsultar.getSaldo_proveedor()));
         txtplazo.setText(String.valueOf(proveedorAConsultar.getPlazo_limite()));
     }//GEN-LAST:event_idproveedorActionPerformed
-
+    //Al hacer clic sobre un producto en la lista se obtiene
     private void listaproductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaproductosMouseClicked
-       // Alisson López traslado selección a textfield y precio del producto
-         String productoSeleccionado =listaproductos.getSelectedValue();
+                // Alisson López traslado selección a textfield y precio del producto
+                
+        // Obtiene el nombre del producto seleccionado en la lista
+        String productoSeleccionado =listaproductos.getSelectedValue();
+        //Decision si el producto seleccionado no esta vacio se establece 
         if (productoSeleccionado != null) 
         NomProductotxt.setText(productoSeleccionado);
     }//GEN-LAST:event_listaproductosMouseClicked
-
+    
+    //Cuando se ejecute el boton agregar
     private void agregaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregaActionPerformed
+        //LLama al metodo de calcular
         calcularTotal();
-      
+        
+        //Creando instancias a utilizar
         Compras_cppDAO compras_cppDAO = new Compras_cppDAO();
         Compra_cpp comprasAInsertar = new Compra_cpp();
         
+        //se obtiene el id del proveedor seleccionado
         String prseleccionado = (String) idproveedor.getSelectedItem();
         
+        //Estableciendo los valores de los campos del formulario 
         comprasAInsertar.setNombre_usuario(txtnombre.getText());
         comprasAInsertar.setApellido_usuario(txtapellido.getText());
         comprasAInsertar.setId_proveedor(Integer.valueOf(prseleccionado));
@@ -524,57 +567,76 @@ public class Compras extends javax.swing.JInternalFrame {
         comprasAInsertar.setSaldo_anterior(Integer.parseInt(saldopen.getText()));
         comprasAInsertar.setPlazo(Integer.parseInt(txtplazo.getText()));
         
+        //Obteniendo el valor de las variables
         String cantidadTexto = cantidadtxt.getText();
         String precioTexto = precio.getText();
         String saldoTexto = saldopen.getText();
+        
+        //Conviertiendo los valores a enteros
         int cantidad = Integer.parseInt(cantidadTexto);
         int precio = Integer.parseInt(precioTexto);
         int saldo = Integer.parseInt(saldoTexto);
+        
+        //Operacion para calcular el total del objeto comprado
         int total = (cantidad * precio) + saldo;
         
+        //Estableciendo el total calculado
         comprasAInsertar.setTotal(total);
         compras_cppDAO.insert(comprasAInsertar);
+        
+        //LLama al metodo de llenado de tablas
         llenadoDeTablas();
         
         try {
+            //Se obtiene la conexion
             Connection conn = Conexion.getConnection();
+            //Obteniendo los valores de las variables
             int cantidadComprada = Integer.parseInt(cantidadtxt.getText());
             int proCodigo = Integer.parseInt(codiprotxt.getText());
-
+            
+            //Consulta sql para obtener las existencias actuales
             String sqlSelect = "SELECT proExistencias FROM tbl_productos WHERE proCodigo = ?";
             PreparedStatement psSelect = conn.prepareStatement(sqlSelect);
             psSelect.setInt(1, proCodigo);
             ResultSet rs = psSelect.executeQuery();
-
+            
+            //Decision si se encuentra el producto se verifica la cantidad de existencias
             if (rs.next()) {
                 int stockActual = rs.getInt("proExistencias");
-
+                
+                // Si la cantidad comprada excede el stock disponible, muestra advertencia
                 if (cantidadComprada > stockActual) {
                     JOptionPane.showMessageDialog(null, "No hay suficiente stock. Disponible: " + stockActual);
                     return;
                 }
-
+                
+                //Actualizar el stock de los productos existentes 
                 String sqlUpdate = "UPDATE tbl_productos SET proExistencias = proExistencias - ? WHERE proCodigo = ?";
                 PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
+                //Asignacion de los parametros para la sentencia 
                 psUpdate.setInt(1, cantidadComprada);
                 psUpdate.setInt(2, proCodigo);
-
+                
+                // Ejecuta la actualización y obtiene la cantidad de filas afectadas
                 int filas = psUpdate.executeUpdate();
 
                 if (filas > 0) {
+                  
                     JOptionPane.showMessageDialog(null, "Compra realizada correctamente");
                 } else {
                     JOptionPane.showMessageDialog(null, "No se encontró el producto para actualizar.");
                 }
-
+                // Cierra los recursos de la base de datos para evitar fugas
                 psUpdate.close();
             }
                     rs.close();
                     psSelect.close();
 
         } catch (NumberFormatException ex) {
+              // Captura errores por ingresar datos no numéricos y muestra alerta
             JOptionPane.showMessageDialog(null, "Por favor, ingresá solo números válidos.");
         } catch (SQLException ex) {
+            // Muestra error detallado si falla la actualización en base de datos
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error al actualizar el stock: " + ex.getMessage());
         }
@@ -598,25 +660,33 @@ public class Compras extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_listaproductosAncestorAdded
 
     private void BAyudasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BAyudasActionPerformed
-        //ayuda implementada por Andy
+                                //ayuda implementada por Andy
         try {
+            // Ejecuta el archivo de ayuda usando el visor de archivos CHM de Windows
             if ((new File("src\\main\\java\\ayudas\\ayudaComprasTransaccional.chm")).exists()) {
                 Process p = Runtime
                         .getRuntime()
                         .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\ayudaComprasTransaccional.chm");
                 p.waitFor();
             } else {
+                // Muestra mensaje en consola si no se encuentra el archivo de ayuda
                 System.out.println("La ayuda no Fue encontrada");
             }
+            
             System.out.println("Correcto");
         } catch (Exception ex) {
+             // En caso de error, imprime la traza para diagnóstico
             ex.printStackTrace();
         }  
     }//GEN-LAST:event_BAyudasActionPerformed
-
+        
     private void ReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReporteActionPerformed
+    //Implementacion de reportes por Andre Gonzales
+        
+    // Crea instancia del DAO de compras para acceder a la lógica de datos
     Compras_cppDAO compras_cppDAO = new Compras_cppDAO();
-        compras_cppDAO.imprimirReporte();
+    // Llama al método que genera e imprime el reporte de compras
+    compras_cppDAO.imprimirReporte();
     }//GEN-LAST:event_ReporteActionPerformed
 
     private void cantidadtxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cantidadtxtActionPerformed

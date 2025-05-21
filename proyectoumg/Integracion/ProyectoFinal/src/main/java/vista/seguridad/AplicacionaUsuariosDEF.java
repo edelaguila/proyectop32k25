@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+//Declaracion del paquete vista.seguridad
 package vista.seguridad;
 //agregado para tabla relusuapl Hecho por Pablo Palencia
 import Modelo.seguridad.RelusuaplDAO; //Pablo Palencia: Para boton asignar
@@ -40,7 +41,11 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
         }
     }*/
 //--------------------------------------------------------------------------prueba
+    
+    //Declaracion de la clase aplicaciones usuariosDEF
     public class AplicacionaUsuariosDEF extends javax.swing.JInternalFrame {
+        
+    //Metodo para el llenado de combo box
     public void llenadoDeCombos() {
         //DESPLIEGUE DE USUARIOS EN COMBOBOX HECHO POR KATHIA CONTRERAS
         //crea objeto
@@ -87,10 +92,11 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
 });
     }
     
+    //Declaracion de la clase AplicaiconaUsuariosDEF
     public AplicacionaUsuariosDEF() {
         initComponents();
         llenadoDeCombos();
-        //HECHO POR KATHIA CONTRERAS OCULTAMIENDO DE DERECHOS
+                        //HECHO POR KATHIA CONTRERAS OCULTAMIENDO DE DERECHOS
        ins.setVisible(false); 
        impr.setVisible(false); 
        elim.setVisible(false); 
@@ -442,12 +448,16 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-         //HECHO POR KATHIA CONTRERAS OCULTAMIENDO DE DERECHOS
+                    //HECHO POR KATHIA CONTRERAS OCULTAMIENDO DE DERECHOS
+       //Boton insertar visible
        ins.setVisible(true); 
+       //Boton imprimir visible
        impr.setVisible(true); 
+       //Boton eliminar visible
        elim.setVisible(true); 
+       //Boton editar visible
        edit.setVisible(true); 
       
        jLabel8.setVisible(true);
@@ -492,21 +502,27 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
     DefaultListModel<String> modelo = new DefaultListModel<>();
     String apli="";
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-       //LLENADO DE TABLA UNO POR UNO HECHO POR KATHIA CONTRERAS
+                        //LLENADO DE TABLA UNO POR UNO HECHO POR KATHIA CONTRERAS
         apli= lst1App.getSelectedValue().toString();
         modelo.addElement(apli); 
         lst2App.setModel(modelo);
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        //llenado de lista2 HECHO POR KATHIA CONTRERAS
+                             //llenado de lista2 HECHO POR KATHIA CONTRERAS
+        //Creacion de la instancia aplicaciondao
         AplicacionDAO aplicacionDAO = new AplicacionDAO();
+        // Se obtienen todas las aplicaciones almacenadas en la base de datos 
         List<Aplicacion> aplicaciones = aplicacionDAO.select(); 
+        
+        // Se crea un modelo por defecto para una JList, que almacenará los nombres de las aplicaciones
         DefaultListModel<String> modelo = new DefaultListModel<>(); 
-
+        
+        // Por cada objeto Aplicacion recuperado, se extrae el nombre y se agrega al modelo de la lista
         for (Aplicacion app : aplicaciones) {
         modelo.addElement(app.getNombre_aplicacion()); 
         }
+        // Finalmente, se establece el modelo en el componente lst2App (una JList) para que se muestren los nombres
         lst2App.setModel(modelo);
         //PENDIENTE VERIFICAR
         /*int resultadoBitacora=0;
@@ -515,9 +531,11 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        //HECHO POR KATHIA CONTRERAS
+                                    //HECHO POR KATHIA CONTRERAS
+                                    
+        // Se crea un modelo por defecto para una JList, que almacenará los nombres de las aplicaciones                                
         DefaultListModel<String> modelo = new DefaultListModel<>();
-    
+        
         modelo.clear();
         lst2App.setModel(modelo);
       
@@ -576,7 +594,7 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
             //inserta a la tabla
             relusuaplDAO.insert(relusuaplAInsertar);
             JOptionPane.showMessageDialog(this, "Asignacion Exitosa", "Anuncio", JOptionPane.INFORMATION_MESSAGE);
-            //Hecho por ALISSON LÓPEZ 7225 : Reinicio del ciclo 
+                                //Hecho por ALISSON LÓPEZ 7225 : Reinicio del ciclo 
             ins.setVisible(false); 
             impr.setVisible(false); 
             elim.setVisible(false); 
@@ -585,13 +603,15 @@ public class AplicacionaUsuarios extends javax.swing.JInternalFrame {
             ASIGNAR.setVisible(false);
             jTextField4.setVisible(false);
             jLabel7.setVisible(false);
-            
-            jTextField1.setText(" ");
-            jTextField2.setText(" ");
-            jTextField3.setText(" ");
-            jTextField4.setText(" ");
-            
-            lst2App.clearSelection();
+                
+                //Se limpia el contenido de los texfield
+                jTextField1.setText(" ");
+                jTextField2.setText(" ");
+                jTextField3.setText(" ");
+                jTextField4.setText(" ");
+                
+                // Se deselecciona cualquier elemento seleccionado en la lista lst2App
+                lst2App.clearSelection();
         }
     }//GEN-LAST:event_ASIGNARActionPerformed
 
