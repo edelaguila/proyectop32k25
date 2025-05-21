@@ -221,5 +221,39 @@ public class ClientesDAO {
        
         return clientes;
     }
+    
+    public Clientes getById(int idCliente) {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    Clientes cliente = null;
+    
+    try {
+        conn = Conexion.getConnection();
+        String sql = "SELECT * FROM clientes WHERE id_cliente = ?";
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, idCliente);
+        rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            cliente = new Clientes();
+            cliente.setId_cliente(rs.getInt("id_cliente"));
+            cliente.setNombre_cliente(rs.getString("nombre_cliente"));
+            cliente.setApellido_cliente(rs.getString("apellido_cliente"));
+            cliente.setDias_credito_CLE(rs.getInt("dias_credito")); // Asegúrate que este campo existe
+            cliente.setSaldo_actual_CLE(rs.getDouble("saldo_actual")); // Asegúrate que este campo existe
+            // Agrega aquí otros campos necesarios
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace(System.out);
+    } finally {
+        Conexion.close(rs);
+        Conexion.close(stmt);
+        Conexion.close(conn);
+    }
+    return cliente;
+}
+    
+    
             
 }

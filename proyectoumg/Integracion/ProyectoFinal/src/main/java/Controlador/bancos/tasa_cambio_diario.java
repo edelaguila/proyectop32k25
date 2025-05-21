@@ -11,16 +11,22 @@ public  class  tasa_cambio_diario{
     private int id_tasa_cambio_diario;
     private float valor_promedio_dia;
     private java.time.LocalDateTime fecha_hora; // Utilizando el tipo de fecha y hora moderno de Java
-
+//Se uso antes uno ya no apto
+    //Costructor sin sobre cargar 
     public tasa_cambio_diario() {
     }
 
+    //constructo sobre cargado 
     public tasa_cambio_diario(int id_tasa_cambio_diario, float valor_promedio_dia, LocalDateTime fecha_hora) {
         this.id_tasa_cambio_diario = id_tasa_cambio_diario;
         this.valor_promedio_dia = valor_promedio_dia;
         this.fecha_hora = fecha_hora;
     }
-
+/*
+    sirve para proporcionar una representación de cadena legible de un objeto de la clase
+    
+    La anotación @Override indica que este método está sobrescribiendo un método de una superclase (en este caso, el método toString() de la clase Object)
+    */
     @Override
     public String toString() {
         return "tasa_historial_banco{" + "id_tasa_cambio_diario=" + id_tasa_cambio_diario + ", valor_promedio_dia=" + valor_promedio_dia + ", fecha_hora=" + fecha_hora + '}';

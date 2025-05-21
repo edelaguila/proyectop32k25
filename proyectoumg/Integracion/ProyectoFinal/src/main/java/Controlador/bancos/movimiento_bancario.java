@@ -9,20 +9,27 @@ import java.time.LocalDateTime;
 // Se uso encapsulate field para get y set 
 
 public class movimiento_bancario {
-    private int id_movimiento_bancario;
-    private int id_tipo_cuenta; // 
-    private LocalDateTime fecha;
 
+    private int id_movimiento_bancario;
+    private int id_cuenta; // 
+    private LocalDateTime fecha;
+    private String tipoSaldo;
+    private float monto;
+    private float saldoActualizado;
+
+ //Costructor sin sobre cargar 
     public movimiento_bancario() {
     }
-
-    public movimiento_bancario(int id_movimiento_bancario, int id_tipo_cuenta, LocalDateTime fecha) {
+//constructo sobre cargado 
+    public movimiento_bancario(int id_movimiento_bancario, int id_cuenta, LocalDateTime fecha, String tipoSaldo, float monto, float saldoActualizado) {
         this.id_movimiento_bancario = id_movimiento_bancario;
-        this.id_tipo_cuenta = id_tipo_cuenta;
+        this.id_cuenta = id_cuenta;
         this.fecha = fecha;
+        this.tipoSaldo = tipoSaldo;
+        this.monto = monto;
+        this.saldoActualizado = saldoActualizado;
     }
 
-   
     public int getId_movimiento_bancario() {
         return id_movimiento_bancario;
     }
@@ -31,12 +38,12 @@ public class movimiento_bancario {
         this.id_movimiento_bancario = id_movimiento_bancario;
     }
 
-    public int getId_tipo_cuenta() {
-        return id_tipo_cuenta;
+    public int getId_cuenta() {
+        return id_cuenta;
     }
 
-    public void setId_tipo_cuenta(int id_tipo_cuenta) {
-        this.id_tipo_cuenta = id_tipo_cuenta;
+    public void setId_cuenta(int id_cuenta) {
+        this.id_cuenta = id_cuenta;
     }
 
     public LocalDateTime getFecha() {
@@ -46,21 +53,38 @@ public class movimiento_bancario {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
-     @Override
+
+    public String getTipoSaldo() {
+        return tipoSaldo;
+    }
+
+    public void setTipoSaldo(String tipoSaldo) {
+        this.tipoSaldo = tipoSaldo;
+    }
+
+    public float getMonto() {
+        return monto;
+    }
+
+    public void setMonto(float monto) {
+        this.monto = monto;
+    }
+    
+    public float getSaldoActualizado() {
+        return saldoActualizado;
+    }
+
+    public void setSaldoActualizado(float saldoActualizado) {
+        this.saldoActualizado = saldoActualizado;
+    }
+/*
+    sirve para proporcionar una representación de cadena legible de un objeto de la clase
+    
+    La anotación @Override indica que este método está sobrescribiendo un método de una superclase (en este caso, el método toString() de la clase Object)
+    */
+    @Override
     public String toString() {
-        return "movimiento_bancario{" + "id_movimiento_bancario=" + id_movimiento_bancario + ", id_tipo_cuenta=" + id_tipo_cuenta + ", fecha=" + fecha + '}';
+        return "movimiento_bancario{" + "id_movimiento_bancario=" + id_movimiento_bancario + ", id_cuenta=" + id_cuenta + ", fecha=" + fecha + ", tipoSaldo=" + tipoSaldo + ", monto=" + monto + ", saldoActualizado=" + saldoActualizado + '}';
     }
-
-    public Object getId_conciliacion() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public Object getId_cuenta() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public String getStatus() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
+    
 }

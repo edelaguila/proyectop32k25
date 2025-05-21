@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package vista.bancos;
+import Controlador.seguridad.UsuarioConectado;  // Para obtener usuario actual
+import Modelo.seguridad.UsuarioDAO;               // Para manejar la lógica de usuario (ajusta el paquete si es otro)
+import Controlador.seguridad.permisos;          // La clase que representa los permisos del usuario (ajusta el paquete)
 
 import Modelo.bancos.tipo_cuentaDAO;
 import Controlador.bancos.tipo_cuenta;
@@ -31,7 +34,14 @@ import net.sf.jasperreports.view.JasperViewer;
  */
 public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
     int APLICACION = 105;
+        private Connection connectio;
+    // 🔒 Variables para permisos
+    private int idUsuarioSesion;
+    private UsuarioDAO usuarioDAO;
+    private permisos permisos;
+private permisos permisosUsuarioActual; 
 
+// Método para llenar la tabla con datos de tipos de cuenta
     public void llenadoDeCombos() {
         tipo_cuentaDAO tipo_cuentaDAO = new tipo_cuentaDAO();
         List<tipo_cuenta> cuentas = tipo_cuentaDAO.select();
@@ -40,7 +50,7 @@ public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
             cbox_empleado.addItem(cuentas.get(i).getTipo_cuenta());
         }
     }
-
+// 📋 Llena la tabla con las tipo_cuentas guardadas
     public void llenadoDeTablas() {
         DefaultTableModel modelo = new DefaultTableModel();
         modelo.addColumn("id_tipo_cuenta");
@@ -61,15 +71,18 @@ public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
         }
     }
 
+    // Método para buscar una cuenta por ID
     public void buscarCuenta() {
         tipo_cuenta tipoCuentaConsultar = new tipo_cuenta();
         tipo_cuentaDAO tipo_cuentaDAO = new tipo_cuentaDAO();
-        tipoCuentaConsultar.setId_tipo_cuenta(Integer.parseInt(txtbuscado.getText()));
-        tipoCuentaConsultar = tipo_cuentaDAO.query(tipoCuentaConsultar);
+        tipoCuentaConsultar.setId_tipo_cuenta(Integer.parseInt(txtbuscado.getText())); // Establecer ID a buscar
+        tipoCuentaConsultar = tipo_cuentaDAO.query(tipoCuentaConsultar);// Consultar en la base de datos
 
+         // Mostrar datos en los campos de texto
         txtTipo_cuenta.setText(tipoCuentaConsultar.getTipo_cuenta());
         txtStatus.setText(Integer.toString(tipoCuentaConsultar.getStatus()));
         
+        // Registrar la acción en la bitácora
         int resultadoBitacora = 0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
@@ -77,11 +90,24 @@ public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
         );
     }
 
+    // Constructor de la clase
     public MantenimientoTipo_cuenta() {
         initComponents();
         llenadoDeTablas();
         llenadoDeCombos();
+     // 🔐 Validación de permisos
+       idUsuarioSesion = UsuarioConectado.getIdUsuario();
+
+        usuarioDAO = new UsuarioDAO();
+        permisos = usuarioDAO.obtenerPermisosPorUsuario(idUsuarioSesion);
+
+        // Habilitar o deshabilitar botones según permisos
+        btnEliminar.setEnabled(permisos.isPuedeEliminar());
+        btnRegistrar.setEnabled(permisos.isPuedeRegistrar());
+        btnModificar.setEnabled(permisos.isPuedeModificar());
+
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -244,11 +270,10 @@ public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
                             .addComponent(txtStatus)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(29, 29, 29)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jButton2))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -321,16 +346,17 @@ public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+// Método para eliminar un tipo de cuenta
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
       // TODO add your handling code here:
       tipo_cuentaDAO tipo_cuentaDAO = new tipo_cuentaDAO();
       tipo_cuenta tipoCuentaAEliminar = new tipo_cuenta();
-      tipoCuentaAEliminar.setId_tipo_cuenta(Integer.parseInt(txtbuscado.getText()));
+      tipoCuentaAEliminar.setId_tipo_cuenta(Integer.parseInt(txtbuscado.getText()));// Obtener ID a eliminar
       tipoCuentaAEliminar.setStatus(Integer.parseInt(txtStatus.getText()));
-      tipo_cuentaDAO.delete(tipoCuentaAEliminar);
-      llenadoDeTablas();
+      tipo_cuentaDAO.delete(tipoCuentaAEliminar);// Eliminar de la base de datos
+      llenadoDeTablas();// Actualizar la tabla
       
+      // Registrar la acción en la bitácora
       UsuarioConectado usuarioEnSesion = new UsuarioConectado();
       int resultadoBitacora = 0;
       Bitacora bitacoraRegistro = new Bitacora();
@@ -381,14 +407,18 @@ public class MantenimientoTipo_cuenta extends javax.swing.JInternalFrame {
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
 //    // TODO add your handling code here:
+
+//Crear DAO y objeto
 tipo_cuentaDAO tipo_cuentaDAO = new tipo_cuentaDAO();
 tipo_cuenta tipoCuentaAActualizar = new tipo_cuenta();
+//Establecer valores desde la interfaz
 tipoCuentaAActualizar.setId_tipo_cuenta(Integer.parseInt(txtbuscado.getText()));
 tipoCuentaAActualizar.setTipo_cuenta(txtTipo_cuenta.getText());
 tipoCuentaAActualizar.setStatus(Integer.parseInt(txtStatus.getText()));
-tipo_cuentaDAO.update(tipoCuentaAActualizar);
+tipo_cuentaDAO.update(tipoCuentaAActualizar);//Ejecutar actualizació
 llenadoDeTablas();
 
+//Registrar en bitácora
 int resultadoBitacora = 0;
 Bitacora bitacoraRegistro = new Bitacora();
 resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Modificar Datos tipo_cuenta");
@@ -396,17 +426,31 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        cbox_empleado.setSelectedIndex(0);
-        txtTipo_cuenta.setText("");
-        txtbuscado.setText("");
-        txtStatus.setText(""); 
-        btnRegistrar.setEnabled(true);
-        btnModificar.setEnabled(true);
-        btnEliminar.setEnabled(true);
+   // Recorre todos los componentes dentro del panel principal//NUEVO METODO FUNCIONAL
+    for (java.awt.Component comp : this.getContentPane().getComponents()) {
+        if (comp instanceof javax.swing.JTextField) {
+            ((javax.swing.JTextField) comp).setText("");
+        } else if (comp instanceof javax.swing.JComboBox) {
+            ((javax.swing.JComboBox<?>) comp).setSelectedIndex(0);
+        }
+    }
+    // Aquí se habilitan los botones según los permisos actuales, no todos en true
+    aplicarPermisos(permisosUsuarioActual);
 
-int resultadoBitacora = 0;
-Bitacora bitacoraRegistro = new Bitacora();
-resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Limpiar Datos tipo_cuenta");
+
+    // botones estén habilitados
+    btnRegistrar.setEnabled(true);
+    btnModificar.setEnabled(true);
+    btnEliminar.setEnabled(true);
+
+    System.out.println("Todos los campos han sido limpiados automáticamente.");
+      UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+      
+//Registra en Bitacora  
+      int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Limpiar TIPO DE CUENTA");
+
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void cbox_empleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbox_empleadoActionPerformed
@@ -447,7 +491,7 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
         try {
                            Connection connectio = Conexion.getConnection();
             report = JasperCompileManager.compileReport(new File("").getAbsolutePath()
-                    + "/src/main/java/reporte/banco/reporteTipocuenta2.jrxml");
+                    + "/src/main/java/reporte/banco/reporteTipocuenta.jrxml");
 //
             print = JasperFillManager.fillReport(report, p, connectio);
 
@@ -460,7 +504,7 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
             JOptionPane.showMessageDialog(this, "Error al generar el reporte: " + e.getMessage());
         }
         
-    //GEN-LAST:event_btnReporteActionPerformed
+                                              
     }//GEN-LAST:event_btnReporteActionPerformed
 
 
@@ -486,4 +530,8 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
     private javax.swing.JTextField txtTipo_cuenta;
     private javax.swing.JTextField txtbuscado;
     // End of variables declaration//GEN-END:variables
+
+    private void aplicarPermisos(permisos permisosUsuarioActual) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

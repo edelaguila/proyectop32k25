@@ -7,19 +7,23 @@ package Controlador.bancos;
 
 public class tipo_cuenta {
 
+    // Identificador único del tipo de cuenta
     private int id_tipo_cuenta;
+    // Nombre del tipo de cuenta (por ejemplo: Ahorro, Corriente)
     private String tipo_cuenta;
-    private int status; // ← Agregado
+    // Estado del tipo de cuenta (por ejemplo: activo = 1, inactivo = 0)
+    private int status; 
 
+    // Constructor vacío
     public tipo_cuenta() {
     }
-
+// Constructor con todos los atributos
     public tipo_cuenta(int id_tipo_cuenta, String tipo_cuenta, int status) { // ← Modificado
         this.id_tipo_cuenta = id_tipo_cuenta;
         this.tipo_cuenta = tipo_cuenta;
         this.status = status;
     }
-
+// Métodos getter y setter para cada atributo
     public int getId_tipo_cuenta() {
         return id_tipo_cuenta;
     }
@@ -44,6 +48,7 @@ public class tipo_cuenta {
         this.status = estatus;
     }
 
+    // Representación en forma de cadena del objeto tipo_cuenta
     @Override
     public String toString() {
         return "tipo_cuenta{" + "id_tipo_cuenta=" + id_tipo_cuenta + ", tipo_cuenta=" + tipo_cuenta + ", status=" + status + '}'; // ← Modificado

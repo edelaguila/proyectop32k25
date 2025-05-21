@@ -1,101 +1,198 @@
 package vista.bancos;
 
+// Importaciones necesarias para control de seguridad, acceso a datos y utilidades
+import Controlador.seguridad.UsuarioConectado;  // Para obtener usuario actual
+import Modelo.seguridad.UsuarioDAO;               // Para manejar la lógica de usuario (ajusta el paquete si es otro)
+import Controlador.seguridad.permisos;          // La clase que representa los permisos del usuario (ajusta el paquete)
+
 import vista.seguridad.*;
 import Controlador.seguridad.Bitacora;
 import Controlador.seguridad.UsuarioConectado;
 import Modelo.Conexion;
 import Modelo.bancos.ConciliacionBancariaDAO;
 import Controlador.bancos.conciliacion_bancaria;
+import Modelo.bancos.cuentas_bancariasDAO;
+import Controlador.bancos.cuentas_bancarias;
+import Modelo.bancos.MovimientoBancarioDAO;
+import Controlador.bancos.movimiento_bancario;
+
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 import java.io.File;
 import java.sql.Connection;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+
+// Librerías para generación de reportes con JasperReports
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
+//Mishel Loeiza Ramirez
+//Modificado por Anderson Rodriguez
 
 public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFrame {
 
-    int APLICACION = 105; // Código de la aplicación para bitácora
+    int APLICACION = 111; // Código de la aplicación para bitácora
+      private Connection connectio;
+    // 🔒 Variables para permisos
+    private int idUsuarioSesion;
+    private UsuarioDAO usuarioDAO;
+    private permisos permisos;
+    private permisos permisosUsuarioActual;
+    
+    // DAO para operaciones con conciliaciones bancarias
     private ConciliacionBancariaDAO conciliacionDAO = new ConciliacionBancariaDAO();
-
+    // Método para llenar el combo box de estado con opciones predefinidas
     public void llenadoDeCombos() {
-        cbox_empleado.addItem("Seleccione una opción");
+        cboStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Seleccione", "CONCILIADO", "PENDIENTE"}));
     }
-
+    // Método para llenar la tabla con los datos de conciliaciones existentes
     public void llenadoDeTablas() {
-        DefaultTableModel modelo = new DefaultTableModel();
+         DefaultTableModel modelo = new DefaultTableModel();
         modelo.addColumn("ID Conciliación");
-        modelo.addColumn("ID Tipo Cuenta");
+        modelo.addColumn("ID Cuenta");
+        modelo.addColumn("ID Movimiento Bancario");
         modelo.addColumn("Fecha");
+        modelo.addColumn("Saldo");
+        modelo.addColumn("Saldo Actualizado");
         modelo.addColumn("Estado");
-
+        // Obtener lista de conciliaciones desde la base de datos
         List<conciliacion_bancaria> lista = conciliacionDAO.select();
         tblMovimientos.setModel(modelo);
-
-        String[] dato = new String[4];
+        // Llenar cada fila de la tabla con los datos formateados
+        String[] dato = new String[7];
         for (conciliacion_bancaria conc : lista) {
             dato[0] = String.valueOf(conc.getId_conciliacion());
-            dato[1] = String.valueOf(conc.getId_tipo_cuenta());
-            dato[2] = conc.getFecha().toString();
-            dato[3] = conc.getStatus();
+            dato[1] = String.valueOf(conc.getId_cuenta());
+            dato[2] = String.valueOf(conc.getId_movimiento_bancario());
+            dato[3] = conc.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            dato[4] = String.valueOf(conc.getSaldo());
+            dato[5] = String.valueOf(conc.getSaldo_actualizado());
+            dato[6] = conc.getStatus();
             modelo.addRow(dato);
         }
     }
-
+    // Método para buscar una conciliación específica por ID
     public void buscarConciliacion() {
-        conciliacion_bancaria consulta = new conciliacion_bancaria();
-        consulta.setId_conciliacion(Integer.parseInt(txtbuscado.getText()));
-        consulta = conciliacionDAO.query(consulta);
-
-        if (consulta != null) {
-            txtIidCuenta.setText(String.valueOf(consulta.getId_tipo_cuenta()));
-            txtFecha.setText(consulta.getFecha().toString());
-            txtEstado.setText(consulta.getStatus());
-
-            Bitacora bitacoraRegistro = new Bitacora();
-            bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Buscar Conciliación");
-        } else {
-            JOptionPane.showMessageDialog(this, "Conciliación no encontrada.");
+        try {
+            // Validar que se haya ingresado un ID
+            if (txtbuscado.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Ingrese un ID para buscar", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // Crear objeto de búsqueda y consultar en la base de datos
+            conciliacion_bancaria consulta = new conciliacion_bancaria();
+            consulta.setId_conciliacion(Integer.parseInt(txtbuscado.getText()));
+            consulta = conciliacionDAO.query(consulta);
+            // Si se encuentra, llenar los campos del formulario con los datos
+            if (consulta != null) {
+                txtIdCuenta.setText(String.valueOf(consulta.getId_cuenta()));
+                txtIdMovimiento.setText(String.valueOf(consulta.getId_movimiento_bancario()));
+                txtFecha.setText(consulta.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                txtSaldo.setText(String.valueOf(consulta.getSaldo()));
+                txtSaldoActualizado.setText(String.valueOf(consulta.getSaldo_actualizado()));
+                cboStatus.setSelectedItem(consulta.getStatus());
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró ninguna conciliación", "Búsqueda sin resultados", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (NumberFormatException e) {
+            // Manejo de error si el ID no es un número válido
+            JOptionPane.showMessageDialog(this, "El ID debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            // Manejo de cualquier otro error
+            JOptionPane.showMessageDialog(this, "Error al buscar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public TransacionalConciliacion_bancaria() {
-        initComponents();
+    initComponents(); // Inicializa los componentes gráficos del formulario
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        txtFecha.setText(formatter.format(LocalDateTime.now()));
-        txtFecha.setForeground(Color.GRAY);
+    // 🕒 Establecer la fecha actual automáticamente al abrir el formulario
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    txtFecha.setText(formatter.format(LocalDateTime.now())); // Asigna la fecha y hora actual
+    txtFecha.setEditable(false); // Evita que el usuario edite el campo
+    txtFecha.setBackground(new Color(240, 240, 240)); // Fondo gris claro para indicar que es automático
+    txtFecha.setForeground(new Color(100, 100, 100)); // Texto gris más fuerte para visibilidad
 
-        txtFecha.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (txtFecha.getForeground().equals(Color.GRAY)) {
-                    txtFecha.setText("");
-                    txtFecha.setForeground(Color.BLACK);
+    // 📌 Listener para cuando el campo de ID de cuenta pierde el foco
+    txtIdCuenta.addFocusListener(new java.awt.event.FocusAdapter() {
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            if (!txtIdCuenta.getText().trim().isEmpty()) {
+                try {
+                    int idCuenta = Integer.parseInt(txtIdCuenta.getText().trim());
+                    cuentas_bancariasDAO cuentaDAO = new cuentas_bancariasDAO();
+                    cuentas_bancarias cuenta = new cuentas_bancarias();
+                    cuenta.setId_cuenta(idCuenta);
+                    cuenta = cuentaDAO.query(cuenta); // Consulta la cuenta en la base de datos
+                    if (cuenta != null) {
+                        txtSaldo.setText(String.valueOf(cuenta.getSaldo())); // Muestra el saldo de la cuenta
+                    } else {
+                        JOptionPane.showMessageDialog(null, "ID de cuenta no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "ID de cuenta debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+        }
+    });
 
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (txtFecha.getText().isEmpty()) {
-                    txtFecha.setText(formatter.format(LocalDateTime.now()));
-                    txtFecha.setForeground(Color.GRAY);
+    // 📌 Listener para cuando el campo de ID de movimiento pierde el foco
+    txtIdMovimiento.addFocusListener(new java.awt.event.FocusAdapter() {
+        public void focusLost(java.awt.event.FocusEvent evt) {
+            if (!txtIdMovimiento.getText().trim().isEmpty()) {
+                try {
+                    int idMovimiento = Integer.parseInt(txtIdMovimiento.getText().trim());
+                    MovimientoBancarioDAO movimientoDAO = new MovimientoBancarioDAO();
+                    movimiento_bancario movimiento = new movimiento_bancario();
+                    movimiento.setId_movimiento_bancario(idMovimiento);
+                    movimiento = movimientoDAO.query(movimiento); // Consulta el movimiento en la base de datos
+                    if (movimiento != null) {
+                        txtSaldoActualizado.setText(String.valueOf(movimiento.getSaldoActualizado())); // Muestra el saldo actualizado
+
+                        // ⚖️ Comparar saldos y establecer automáticamente el estado
+                        if (txtSaldo.getText().equals(txtSaldoActualizado.getText())) {
+                            cboStatus.setSelectedItem("CONCILIADO");
+                        } else {
+                            cboStatus.setSelectedItem("PENDIENTE");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "ID de movimiento no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "ID de movimiento debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        });
+        }
+    });
 
-        llenadoDeTablas();
-        llenadoDeCombos();
-    }
+    // 📋 Llenar la tabla con los datos existentes
+    llenadoDeTablas();
+
+    // 🔄 Llenar el combo box de estado y deshabilitarlo para que no sea editable
+    llenadoDeCombos();
+    cboStatus.setEnabled(false); // Desactiva la interacción del usuario
+    cboStatus.setBackground(new Color(230, 230, 230)); // Fondo gris claro
+    cboStatus.setForeground(new Color(100, 100, 100)); // Texto gris medio
+
+    // 🔐 Validación de permisos del usuario actual
+    idUsuarioSesion = UsuarioConectado.getIdUsuario(); // Obtiene el ID del usuario en sesión
+    usuarioDAO = new UsuarioDAO();
+    permisos = usuarioDAO.obtenerPermisosPorUsuario(idUsuarioSesion); // Consulta los permisos del usuario
+
+    // 🔧 Habilita o deshabilita botones según los permisos del usuario
+    btnEliminar.setEnabled(permisos.isPuedeEliminar());
+    btnRegistrar.setEnabled(permisos.isPuedeRegistrar());
+    btnModificar.setEnabled(permisos.isPuedeModificar());
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -116,20 +213,23 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
         btnModificar = new javax.swing.JButton();
         label3 = new javax.swing.JLabel();
         txtbuscado = new javax.swing.JTextField();
-        txtIidCuenta = new javax.swing.JTextField();
+        txtIdCuenta = new javax.swing.JTextField();
         btnLimpiar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblMovimientos = new javax.swing.JTable();
-        cbox_empleado = new javax.swing.JComboBox<>();
-        label4 = new javax.swing.JLabel();
         txtFecha = new javax.swing.JTextField();
         label5 = new javax.swing.JLabel();
         lb = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         btnAyudasTasaDecambioDiario = new javax.swing.JButton();
         btnreporteTasaDecambioDiario = new javax.swing.JButton();
-        txtEstado = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        cboStatus = new javax.swing.JComboBox<>();
+        label4 = new javax.swing.JLabel();
+        txtIdMovimiento = new javax.swing.JTextField();
+        label6 = new javax.swing.JLabel();
+        txtSaldo = new javax.swing.JTextField();
+        label7 = new javax.swing.JLabel();
+        txtSaldoActualizado = new javax.swing.JTextField();
+        label8 = new javax.swing.JLabel();
 
         lb2.setForeground(new java.awt.Color(204, 204, 204));
         lb2.setText(".");
@@ -176,8 +276,8 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
         label3.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
         label3.setText("Id_cuenta");
 
-        txtIidCuenta.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        txtIidCuenta.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
+        txtIdCuenta.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+        txtIdCuenta.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
 
         btnLimpiar.setText("Limpiar");
         btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
@@ -208,16 +308,6 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
             tblMovimientos.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        cbox_empleado.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        cbox_empleado.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbox_empleadoActionPerformed(evt);
-            }
-        });
-
-        label4.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        label4.setText("Empleado:");
-
         txtFecha.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
         txtFecha.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
 
@@ -226,8 +316,6 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
 
         lb.setForeground(new java.awt.Color(204, 204, 204));
         lb.setText(".");
-
-        jButton1.setText("jButton1");
 
         btnAyudasTasaDecambioDiario.setText("Ayuda");
         btnAyudasTasaDecambioDiario.addActionListener(new java.awt.event.ActionListener() {
@@ -243,7 +331,33 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
             }
         });
 
-        jLabel1.setText("Status");
+        cboStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PENDIENTE", "CONCILIADO", " " }));
+
+        label4.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
+        label4.setText("Id_movimiento");
+
+        txtIdMovimiento.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+        txtIdMovimiento.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
+        txtIdMovimiento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIdMovimientoActionPerformed(evt);
+            }
+        });
+
+        label6.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
+        label6.setText("Saldo Cuenta");
+
+        txtSaldo.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+        txtSaldo.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
+
+        label7.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
+        label7.setText("Saldo Act.");
+
+        txtSaldoActualizado.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
+        txtSaldoActualizado.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
+
+        label8.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
+        label8.setText("Status");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -251,17 +365,22 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(label4)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtIdMovimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(358, 358, 358)
                                 .addComponent(lb, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(29, 29, 29)
+                                .addGap(28, 28, 28)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnLimpiar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
-                                    .addComponent(btnAyudasTasaDecambioDiario, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnAyudasTasaDecambioDiario, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
@@ -271,87 +390,93 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                             .addComponent(btnreporteTasaDecambioDiario, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(btnBuscar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE))
+                                            .addComponent(btnBuscar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(label3)
-                                    .addComponent(label5))
-                                .addGap(45, 45, 45)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtFecha)
-                                    .addComponent(txtIidCuenta, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE))))
-                        .addGap(0, 2, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(0, 6, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(62, 62, 62)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addGap(70, 70, 70)
-                                .addComponent(label4)
-                                .addGap(46, 46, 46)
-                                .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(48, 48, 48))
+                                .addComponent(label5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(label6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(label3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtIdCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(label1)
-                                .addGap(253, 253, 253))))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(label7)
+                                    .addComponent(label8))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtSaldoActualizado, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                                    .addComponent(cboStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(243, 243, 243)
+                        .addComponent(label1)
+                        .addGap(253, 253, 253))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(label1)
+                .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(label1)
-                        .addGap(4, 4, 4)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lb)
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtIidCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(label3))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(label5))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jLabel1))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnRegistrar)
-                                    .addComponent(btnEliminar)
-                                    .addComponent(btnModificar))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnBuscar)
-                                    .addComponent(btnLimpiar))))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 126, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lb)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(label3)
+                            .addComponent(txtIdCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(label4)
-                            .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtIdMovimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(label5)
+                            .addComponent(txtFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(label6)
+                            .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(label7)
+                            .addComponent(txtSaldoActualizado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cboStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(label8))
+                        .addGap(55, 55, 55)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnRegistrar)
+                            .addComponent(btnEliminar)
+                            .addComponent(btnModificar))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnBuscar)
+                            .addComponent(btnLimpiar))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnreporteTasaDecambioDiario)
-                            .addComponent(btnAyudasTasaDecambioDiario)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(jButton1)))
-                .addContainerGap(69, Short.MAX_VALUE))
+                            .addComponent(btnAyudasTasaDecambioDiario))
+                        .addGap(40, 40, 40))))
         );
 
         pack();
@@ -360,32 +485,30 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 
     try {
-        // Crear objeto de conciliación bancaria
+        // Crear objeto de conciliación a eliminar
         conciliacion_bancaria conciliacionEliminar = new conciliacion_bancaria();
         String idConciliacionText = txtbuscado.getText().trim();
-        
-        // Validar ID de conciliación
+
+        // Validar que el ID ingresado no esté vacío y sea numérico
         if (idConciliacionText.isEmpty() || !idConciliacionText.matches("\\d+")) {
             JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID válido.");
             return;
         }
-        
-        conciliacionEliminar.setId_conciliacion(Integer.parseInt(idConciliacionText));
 
-        // Eliminar conciliación bancaria usando el DAO
-        conciliacion_bancariaDAO conciliacionDAO = new conciliacion_bancariaDAO();
+        // Establecer el ID y eliminar la conciliación
+        conciliacionEliminar.setId_conciliacion(Integer.parseInt(idConciliacionText));
         conciliacionDAO.delete(conciliacionEliminar);
 
-        // Actualizar las tablas
+        // Actualizar la tabla después de eliminar
         llenadoDeTablas();
 
-        // Registrar en la bitácora
+        // Registrar acción en bitácora
         Bitacora bitacoraRegistro = new Bitacora();
         bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Eliminar Conciliación Bancaria");
 
-        // Mensaje de confirmación
         JOptionPane.showMessageDialog(this, "Conciliación eliminada correctamente.");
     } catch (Exception e) {
+        // Mostrar mensaje de error si ocurre una excepción
         JOptionPane.showMessageDialog(this, "Error al eliminar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 
@@ -394,115 +517,130 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
                                         
     try {
+        // Crear nueva instancia de conciliación
         conciliacion_bancaria nuevaConciliacion = new conciliacion_bancaria();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        if (txtIidCuenta.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Debe ingresar un ID de cuenta", "Error", JOptionPane.ERROR_MESSAGE);
+        // Validar que los campos obligatorios no estén vacíos
+        if (txtIdCuenta.getText().trim().isEmpty() || txtIdMovimiento.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe ingresar un ID de cuenta y un ID de movimiento", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        nuevaConciliacion.setId_tipo_cuenta(Integer.parseInt(txtIidCuenta.getText()));
+        // Obtener fecha actual y llenar los datos de la conciliación
+        LocalDateTime fechaActual = LocalDateTime.now();
+        nuevaConciliacion.setId_cuenta(Integer.parseInt(txtIdCuenta.getText()));
+        nuevaConciliacion.setId_movimiento_bancario(Integer.parseInt(txtIdMovimiento.getText()));
+        nuevaConciliacion.setFecha(fechaActual);
+        nuevaConciliacion.setSaldo(Float.parseFloat(txtSaldo.getText()));
+        nuevaConciliacion.setSaldo_actualizado(Float.parseFloat(txtSaldoActualizado.getText()));
+        nuevaConciliacion.setStatus(cboStatus.getSelectedItem().toString());
 
-        LocalDateTime fecha;
-        if (txtFecha.getText().trim().isEmpty() || txtFecha.getText().equals("yyyy-MM-dd HH:mm:ss")) {
-            fecha = LocalDateTime.now(); 
-            SwingUtilities.invokeLater(() -> {
-                txtFecha.setText(formatter.format(fecha)); 
-                txtFecha.setForeground(Color.BLACK); 
-            });
-        } else {
-            try {
-                fecha = LocalDateTime.parse(txtFecha.getText(), formatter);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this,
-                        "Formato de fecha inválido. Use yyyy-MM-dd\nEjemplo: " + formatter.format(LocalDateTime.now()),
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-
-        nuevaConciliacion.setFecha(fecha);
-
-        ConciliacionBancariaDAO conciliacionDAO = new ConciliacionBancariaDAO();
+        // Insertar la conciliación en la base de datos
         conciliacionDAO.insert(nuevaConciliacion);
 
+        // Actualizar tabla y limpiar campos
         llenadoDeTablas();
+        txtIdCuenta.setText("");
+        txtIdMovimiento.setText("");
+        txtSaldo.setText("");
+        txtSaldoActualizado.setText("");
+        cboStatus.setSelectedIndex(0);
+        txtFecha.setText(formatter.format(fechaActual));
+        txtFecha.setForeground(Color.BLACK);
 
+        // Registrar acción en bitácora
         Bitacora bitacoraRegistro = new Bitacora();
-        bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Insertar Conciliación Bancaria");
+        bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Registro de Conciliación");
 
-        txtIidCuenta.setText(""); 
-        SwingUtilities.invokeLater(() -> {
-            txtFecha.setText("yyyy-MM-dd HH:mm:ss");
-            txtFecha.setForeground(Color.GRAY); 
-        });
-
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "ID de cuenta debe ser numérico", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "¡Registro exitoso! Fecha: " + formatter.format(fechaActual));
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error al registrar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        // Mostrar mensaje de error si ocurre una excepción
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
-      buscarConciliacion();
+    // Ejecuta el método de búsqueda al hacer clic en el botón
+    buscarConciliacion();
+
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-try {
-    conciliacion_bancaria conciliacionActualizar = new conciliacion_bancaria();
-    conciliacionActualizar.setId_conciliacion(Integer.parseInt(txtbuscado.getText()));
-    conciliacionActualizar.setId_tipo_cuenta(Integer.parseInt(txtIidCuenta.getText()));
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    conciliacionActualizar.setFecha(LocalDateTime.parse(txtFecha.getText(), formatter));
+    try {
+        // Crear objeto de conciliación para actualizar
+        conciliacion_bancaria conciliacionActualizar = new conciliacion_bancaria();
 
-    conciliacionActualizar.setStatus(txtEstado.getText().trim());
+        // Validar que los campos obligatorios no estén vacíos
+        if (txtbuscado.getText().trim().isEmpty() || txtIdCuenta.getText().trim().isEmpty() || txtIdMovimiento.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "ID de conciliación, ID de cuenta y ID de movimiento son requeridos", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    conciliacion_bancariaDAO conciliacionDAO = new conciliacion_bancariaDAO();
-    conciliacionDAO.update(conciliacionActualizar);
+        // Establecer los valores en el objeto
+        conciliacionActualizar.setId_conciliacion(Integer.parseInt(txtbuscado.getText()));
+        conciliacionActualizar.setId_cuenta(Integer.parseInt(txtIdCuenta.getText()));
+        conciliacionActualizar.setId_movimiento_bancario(Integer.parseInt(txtIdMovimiento.getText()));
+        conciliacionActualizar.setSaldo(Float.parseFloat(txtSaldo.getText()));
+        conciliacionActualizar.setSaldo_actualizado(Float.parseFloat(txtSaldoActualizado.getText()));
 
-    llenadoDeTablas();
+        try {
+            // Convertir la fecha del campo de texto a LocalDateTime
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime fecha = LocalDateTime.parse(txtFecha.getText(), formatter);
+            conciliacionActualizar.setFecha(fecha);
+        } catch (DateTimeParseException e) {
+            // Mostrar mensaje si el formato de fecha es incorrecto
+            JOptionPane.showMessageDialog(this, "Formato de fecha debe ser: yyyy-MM-dd HH:mm:ss\nEjemplo: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), "Error de formato", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    Bitacora bitacoraRegistro = new Bitacora();
-    bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Modificar Conciliación Bancaria");
+        // Establecer el estado y actualizar en la base de datos
+        conciliacionActualizar.setStatus(cboStatus.getSelectedItem().toString());
+        conciliacionDAO.update(conciliacionActualizar);
 
-    JOptionPane.showMessageDialog(this, "Conciliación modificada correctamente.");
-} catch (Exception e) {
-    JOptionPane.showMessageDialog(this, "Error al modificar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-}
+        // Actualizar tabla y mostrar mensaje de éxito
+        llenadoDeTablas();
+        JOptionPane.showMessageDialog(this, "Conciliación modificada correctamente");
+
+    } catch (NumberFormatException e) {
+        // Validación de campos numéricos
+        JOptionPane.showMessageDialog(this, "IDs deben ser números válidos", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (Exception e) {
+        // Manejo de cualquier otro error
+        JOptionPane.showMessageDialog(this, "Error al modificar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
 
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-cbox_empleado.setSelectedIndex(0);
-txtIidCuenta.setText("");
-txtFecha.setText("yyyy-MM-dd");
-txtFecha.setForeground(Color.GRAY);
-txtEstado.setText("");
-txtbuscado.setText("");
 
-btnRegistrar.setEnabled(true);
-btnModificar.setEnabled(true);
-btnEliminar.setEnabled(true);
+    // Recorre todos los componentes dentro del panel principal//NUEVO METODO FUNCIONAL
+    for (java.awt.Component comp : this.getContentPane().getComponents()) {
+        if (comp instanceof javax.swing.JTextField) {
+            ((javax.swing.JTextField) comp).setText("");
+        } else if (comp instanceof javax.swing.JComboBox) {
+            ((javax.swing.JComboBox<?>) comp).setSelectedIndex(0);
+        }
+    }
+    // Aquí se habilitan los botones según los permisos actuales, no todos en true
+    aplicarPermisos(permisosUsuarioActual);
 
-// Registrar acción en bitácora
-Bitacora bitacoraRegistro = new Bitacora();
-int resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
-    UsuarioConectado.getIdUsuario(), 
-    APLICACION,  
-    "Limpiar Datos Conciliación Bancaria"
-);
+
+    // botones estén habilitados
+    btnRegistrar.setEnabled(true);
+    btnModificar.setEnabled(true);
+    btnEliminar.setEnabled(true);
+
+    System.out.println("Todos los campos han sido limpiados automáticamente.");
+      UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Limpiar CONCILIACIÒN");
 
     }//GEN-LAST:event_btnLimpiarActionPerformed
-
-    private void cbox_empleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbox_empleadoActionPerformed
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbox_empleadoActionPerformed
 /*
      // TODO add your handling code here:
         MantenimientoAula ventana = new MantenimientoAula();
@@ -512,12 +650,13 @@ int resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
         ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
     */
     private void btnAyudasTasaDecambioDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAyudasTasaDecambioDiarioActionPerformed
-        // TODO add your handling code here:
-        try {
-            if ((new File("src\\main\\java\\ayudas\\banco\\AyudasTasaCambioDiario.chm")).exists()) {
+     
+    // 📘 Abre el archivo de ayuda .chm si existe en la ruta especificada
+    try {
+            if ((new File("src\\main\\java\\ayudas\\banco\\AyudaBanco.chm")).exists()) {
                 Process p = Runtime
                         .getRuntime()
-                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\banco\\AyudasTasaCambioDiario.chm");
+                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\banco\\AyudaBanco.chm");
                 p.waitFor();
             } else {
                 System.out.println("La ayuda no Fue encontrada");
@@ -527,32 +666,43 @@ int resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
             ex.printStackTrace();
         }
     }//GEN-LAST:event_btnAyudasTasaDecambioDiarioActionPerformed
-private Connection connectio = null;
+
     private void btnreporteTasaDecambioDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnreporteTasaDecambioDiarioActionPerformed
         // TODO add your handling code here:
         
-          Map p = new HashMap();
-        JasperReport report;
-        JasperPrint print;
-        
-        try {
-            connectio = Conexion.getConnection();
-            report = JasperCompileManager.compileReport(new File("").getAbsolutePath()
-            + "/src/main/java/reporte/banco/reporteTasaCambioDiario.jrxml");
-            
-            print = JasperFillManager.fillReport(report, p, connectio);
-            
-            JasperViewer view = new JasperViewer(print, false);
-            
-            view.setTitle("Prueba reporte");
-            view.setVisible(true);
-        } catch (Exception e) {
-        }
-        
-        
-        
+    // 📄 Genera y muestra un reporte de conciliaciones bancarias usando JasperReports
+
+    Map p = new HashMap(); // Parámetros para el reporte (vacío en este caso)
+    JasperReport report;
+    JasperPrint print;
+
+    try {
+        // Establece la conexión con la base de datos
+        connectio = Conexion.getConnection();
+
+        // Compila el archivo .jrxml del reporte
+        report = JasperCompileManager.compileReport(
+            new File("").getAbsolutePath() + "/src/main/java/reporte/banco/Reporteconciliacion.jrxml"
+        );
+
+        // Llena el reporte con los datos y parámetros
+        print = JasperFillManager.fillReport(report, p, connectio);
+
+        // Muestra el reporte en una ventana
+        JasperViewer view = new JasperViewer(print, false);
+        view.setTitle("Prueba reporte");
+        view.setVisible(true);
+    } catch (Exception e) {
+        // Silenciosamente ignora errores (se recomienda agregar manejo de errores)
+    }
+
+
         
     }//GEN-LAST:event_btnreporteTasaDecambioDiarioActionPerformed
+
+    private void txtIdMovimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdMovimientoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdMovimientoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -563,25 +713,32 @@ private Connection connectio = null;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnRegistrar;
     private javax.swing.JButton btnreporteTasaDecambioDiario;
-    private javax.swing.JComboBox<String> cbox_empleado;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> cboStatus;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label1;
     private javax.swing.JLabel label3;
     private javax.swing.JLabel label4;
     private javax.swing.JLabel label5;
+    private javax.swing.JLabel label6;
+    private javax.swing.JLabel label7;
+    private javax.swing.JLabel label8;
     private javax.swing.JLabel lb;
     private javax.swing.JLabel lb2;
     private javax.swing.JLabel lbusu;
     private javax.swing.JTable tblMovimientos;
-    private javax.swing.JTextField txtEstado;
     private javax.swing.JTextField txtFecha;
-    private javax.swing.JTextField txtIidCuenta;
+    private javax.swing.JTextField txtIdCuenta;
+    private javax.swing.JTextField txtIdMovimiento;
+    private javax.swing.JTextField txtSaldo;
+    private javax.swing.JTextField txtSaldoActualizado;
     private javax.swing.JTextField txtbuscado;
     // End of variables declaration//GEN-END:variables
 
-    private static class conciliacion_bancariaDAO {
+    private void aplicarPermisos(permisos permisosUsuarioActual) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    /*private static class conciliacion_bancariaDAO {
 
         public conciliacion_bancariaDAO() {
         }
@@ -589,9 +746,5 @@ private Connection connectio = null;
         private void delete(conciliacion_bancaria conciliacionEliminar) {
             throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         }
-
-        private void update(conciliacion_bancaria conciliacionActualizar) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    }
+    }*/
 }

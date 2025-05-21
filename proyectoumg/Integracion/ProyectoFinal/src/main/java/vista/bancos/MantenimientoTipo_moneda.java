@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package vista.bancos;
+import Controlador.seguridad.UsuarioConectado;  // Para obtener usuario actual
+import Modelo.seguridad.UsuarioDAO;               // Para manejar la lógica de usuario (ajusta el paquete si es otro)
+import Controlador.seguridad.permisos;          // La clase que representa los permisos del usuario (ajusta el paquete)
 
 import Modelo.bancos.tipo_monedaDAO;
 import Controlador.bancos.tipo_moneda;
@@ -24,64 +27,92 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
 
 // MANTENIMIENTO CREADO POR MISHEL LOEIZA 9959-23-3457 
-
+// Modificacion de tasa por Ruddyard Castro 9959-23-1409
 /**
  *
  * @author visitante
  */
 public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
     int APLICACION = 105;
+        private Connection connectio;
+    // 🔒 Variables para permisos
+    private int idUsuarioSesion;
+    private UsuarioDAO usuarioDAO;
+    private permisos permisos;
+private permisos permisosUsuarioActual; 
 
     public void llenadoDeCombos() {
         tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
         List<tipo_moneda> monedas = tipo_monedaDAO.select();
-        cbox_empleado.addItem("Seleccione una opción");
+       
         for (int i = 0; i < monedas.size(); i++) {
-            cbox_empleado.addItem(monedas.get(i).getTipo_moneda());
+            
         }
     }
 
     public void llenadoDeTablas() {
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.addColumn("id_tipo_moneda");
-        modelo.addColumn("tipo_moneda");
-        modelo.addColumn("tasa_cambio_GTQ");
+       DefaultTableModel modelo = new DefaultTableModel();
+    modelo.addColumn("id_tipo_moneda");
+    modelo.addColumn("tipo_moneda");
+    modelo.addColumn("ID Tasa");
+    modelo.addColumn("Valor Tasa");  // Nueva columna
 
-        tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
-        List<tipo_moneda> tipo_monedas = tipo_monedaDAO.select();
-        tablaTipo_moneda.setModel(modelo);
+    tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
+    List<tipo_moneda> tipo_monedas = tipo_monedaDAO.select();
+    tablaTipo_moneda.setModel(modelo);
 
-        String[] dato = new String[3];
-        for (int i = 0; i < tipo_monedas.size(); i++) {
-            dato[0] = Integer.toString(tipo_monedas.get(i).getId_tipo_moneda());
-            dato[1] = tipo_monedas.get(i).getTipo_moneda();
-            dato[2] = Double.toString(tipo_monedas.get(i).getTasa_cambio_usd());
-            modelo.addRow(dato);
-        }
+    String[] dato = new String[4];  // Ahora son 4 columnas
+    for (int i = 0; i < tipo_monedas.size(); i++) {
+        tipo_moneda moneda = tipo_monedas.get(i);
+        dato[0] = Integer.toString(moneda.getId_tipo_moneda());
+        dato[1] = moneda.getTipo_moneda();
+        dato[2] = Integer.toString(moneda.getId_tasa_cambio_diario());
+        // Obtener el valor de la tasa
+        dato[3] = String.valueOf(tipo_monedaDAO.obtenerValorTasaCambio(moneda.getId_tasa_cambio_diario()));
+        modelo.addRow(dato);
+    }
     }
 
     public void buscarMoneda() {
-        tipo_moneda tipoMonedaConsultar = new tipo_moneda();
-        tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
-        tipoMonedaConsultar.setId_tipo_moneda(Integer.parseInt(txtbuscado.getText()));
-        tipoMonedaConsultar = tipo_monedaDAO.query(tipoMonedaConsultar);
+    tipo_moneda tipoMonedaConsultar = new tipo_moneda();
+    tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
+    tipoMonedaConsultar.setId_tipo_moneda(Integer.parseInt(txtbuscado.getText()));
+    tipoMonedaConsultar = tipo_monedaDAO.query(tipoMonedaConsultar);
 
+    if (tipoMonedaConsultar != null) {
         txtTipo_moneda.setText(tipoMonedaConsultar.getTipo_moneda());
-        txtTasa_cambio_usd.setText(Double.toString(tipoMonedaConsultar.getTasa_cambio_usd()));
+        txtTasa_cambio_usd.setText(Integer.toString(tipoMonedaConsultar.getId_tasa_cambio_diario()));
+        
+        // Obtener y mostrar el valor de la tasa de cambio
+        double valorTasa = tipo_monedaDAO.obtenerValorTasaCambio(tipoMonedaConsultar.getId_tasa_cambio_diario());
+        txtValorEnNumero.setText(String.valueOf(valorTasa));
 
         int resultadoBitacora = 0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
             UsuarioConectado.getIdUsuario(), APLICACION, "Buscar Datos tipo_moneda"
         );
+    } else {
+        JOptionPane.showMessageDialog(this, "No se encontró el tipo de moneda con el ID especificado", "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
     public MantenimientoTipo_moneda() {
         initComponents();
         llenadoDeTablas();
         llenadoDeCombos();
-    }
+    // 🔐 Validación de permisos
+       idUsuarioSesion = UsuarioConectado.getIdUsuario();
 
+        usuarioDAO = new UsuarioDAO();
+        permisos = usuarioDAO.obtenerPermisosPorUsuario(idUsuarioSesion);
+
+        
+        btnEliminar.setEnabled(permisos.isPuedeEliminar());
+        btnRegistrar.setEnabled(permisos.isPuedeRegistrar());
+        btnModificar.setEnabled(permisos.isPuedeModificar());
+
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -105,14 +136,12 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
         btnLimpiar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaTipo_moneda = new javax.swing.JTable();
-        cbox_empleado = new javax.swing.JComboBox<>();
-        label4 = new javax.swing.JLabel();
         txtTasa_cambio_usd = new javax.swing.JTextField();
         label5 = new javax.swing.JLabel();
         lb = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnReporte = new javax.swing.JButton();
+        txtValorEnNumero = new javax.swing.JTextField();
 
         lb2.setForeground(new java.awt.Color(204, 204, 204));
         lb2.setText(".");
@@ -191,16 +220,6 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
             tablaTipo_moneda.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        cbox_empleado.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        cbox_empleado.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbox_empleadoActionPerformed(evt);
-            }
-        });
-
-        label4.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        label4.setText("Moneda");
-
         txtTasa_cambio_usd.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
         txtTasa_cambio_usd.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
 
@@ -209,8 +228,6 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
 
         lb.setForeground(new java.awt.Color(204, 204, 204));
         lb.setText(".");
-
-        jButton1.setText("jButton1");
 
         jButton2.setText("Ayuda");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -226,6 +243,13 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
             }
         });
 
+        txtValorEnNumero.setEnabled(false);
+        txtValorEnNumero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtValorEnNumeroActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -233,63 +257,59 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(358, 358, 358)
-                        .addComponent(lb, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(label3)
-                            .addComponent(label5))
-                        .addGap(45, 45, 45)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtTasa_cambio_usd)
-                            .addComponent(txtTipo_moneda, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnModificar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(358, 358, 358)
+                                .addComponent(lb, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(label3)
+                                    .addComponent(label5))
+                                .addGap(45, 45, 45)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
-                                    .addComponent(btnReporte, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(txtTasa_cambio_usd)
+                                    .addComponent(txtTipo_moneda, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(29, 29, 29)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+                                            .addComponent(btnReporte, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(btnRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnModificar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(txtValorEnNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(86, 86, 86)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(62, 62, 62)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addGap(70, 70, 70)
-                                .addComponent(label4)
-                                .addGap(46, 46, 46)
-                                .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(48, 48, 48))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(label1)
-                                .addGap(253, 253, 253))))))
+                        .addGap(0, 223, Short.MAX_VALUE)
+                        .addComponent(label1)
+                        .addGap(253, 253, 253))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 497, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(label1)
+                .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(label1)
-                        .addGap(4, 4, 4)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lb)
                                 .addGap(18, 18, 18)
@@ -300,7 +320,9 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtTasa_cambio_usd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(label5))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(32, 32, 32)
+                                .addComponent(txtValorEnNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(100, 100, 100)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(btnRegistrar)
                                     .addComponent(btnEliminar)
@@ -312,21 +334,12 @@ public class MantenimientoTipo_moneda extends javax.swing.JInternalFrame {
                                     .addComponent(btnLimpiar)
                                     .addComponent(btnBuscar))
                                 .addGap(10, 10, 10)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label4)
-                                    .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(2, 2, 2)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jButton2)
-                                    .addComponent(btnReporte)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(jButton1)))
-                .addContainerGap(21, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton2)
+                            .addComponent(btnReporte)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         pack();
@@ -349,7 +362,8 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUs
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
  // Instancia de tipo_monedaDAO
-tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
+ 
+ tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
 
 // Verifica si el tipo de moneda ya existe
 if (tipo_monedaDAO.existeTipoMoneda(txtTipo_moneda.getText())) {
@@ -359,7 +373,7 @@ if (tipo_monedaDAO.existeTipoMoneda(txtTipo_moneda.getText())) {
     // Si no existe, proceder con la inserción
     tipo_moneda tipoMonedaAInsertar = new tipo_moneda();
     tipoMonedaAInsertar.setTipo_moneda(txtTipo_moneda.getText());
-    tipoMonedaAInsertar.setTasa_cambio_usd(Double.parseDouble(txtTasa_cambio_usd.getText()));
+    tipoMonedaAInsertar.setId_tasa_cambio_diario(Integer.parseInt(txtTasa_cambio_usd.getText()));
 
     // Inserta el nuevo tipo de moneda
     int resultado = tipo_monedaDAO.insert(tipoMonedaAInsertar);
@@ -385,6 +399,9 @@ if (tipo_monedaDAO.existeTipoMoneda(txtTipo_moneda.getText())) {
         JOptionPane.showMessageDialog(null, "Error al insertar el tipo de moneda.", "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
+ 
+ 
+ 
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
@@ -394,11 +411,12 @@ if (tipo_monedaDAO.existeTipoMoneda(txtTipo_moneda.getText())) {
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
 //    // TODO add your handling code here:
+
 tipo_monedaDAO tipo_monedaDAO = new tipo_monedaDAO();
 tipo_moneda tipoMonedaAActualizar = new tipo_moneda();
 tipoMonedaAActualizar.setId_tipo_moneda(Integer.parseInt(txtbuscado.getText()));
 tipoMonedaAActualizar.setTipo_moneda(txtTipo_moneda.getText());
-tipoMonedaAActualizar.setTasa_cambio_usd(Double.parseDouble(txtTasa_cambio_usd.getText()));
+tipoMonedaAActualizar.setId_tasa_cambio_diario(Integer.parseInt(txtTasa_cambio_usd.getText()));
 tipo_monedaDAO.update(tipoMonedaAActualizar);
 llenadoDeTablas();
 
@@ -409,23 +427,29 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        cbox_empleado.setSelectedIndex(0);
-txtTipo_moneda.setText("");
-txtTasa_cambio_usd.setText("");
-txtbuscado.setText("");
-btnRegistrar.setEnabled(true);
-btnModificar.setEnabled(true);
-btnEliminar.setEnabled(true);
+ // Recorre todos los componentes dentro del panel principal//NUEVO METODO FUNCIONAL
+    for (java.awt.Component comp : this.getContentPane().getComponents()) {
+        if (comp instanceof javax.swing.JTextField) {
+            ((javax.swing.JTextField) comp).setText("");
+        } else if (comp instanceof javax.swing.JComboBox) {
+            ((javax.swing.JComboBox<?>) comp).setSelectedIndex(0);
+        }
+    }
+    // Aquí se habilitan los botones según los permisos actuales, no todos en true
+    aplicarPermisos(permisosUsuarioActual);
 
-int resultadoBitacora = 0;
-Bitacora bitacoraRegistro = new Bitacora();
-resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Limpiar Datos tipo_moneda");
+
+    // botones estén habilitados
+    btnRegistrar.setEnabled(true);
+    btnModificar.setEnabled(true);
+    btnEliminar.setEnabled(true);
+
+    System.out.println("Todos los campos han sido limpiados automáticamente.");
+      UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Limpiar TIPO MONEDA");
     }//GEN-LAST:event_btnLimpiarActionPerformed
-
-    private void cbox_empleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbox_empleadoActionPerformed
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbox_empleadoActionPerformed
 /*
      // TODO add your handling code here:
         MantenimientoAula ventana = new MantenimientoAula();
@@ -437,10 +461,10 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         try {
-            if ((new File("src\\main\\java\\ayudas\\ProcesoMayor.chm")).exists()) {
+            if ((new File("src\\main\\java\\ayudas\\banco\\AyudaBanco.chm")).exists()) {
                 Process p = Runtime
                         .getRuntime()
-                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\ProcesoMayor.chm");
+                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\banco\\AyudaBanco.chm");
                 p.waitFor();
             } else {
                 System.out.println("La ayuda no Fue encontrada");
@@ -473,8 +497,12 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
             JOptionPane.showMessageDialog(this, "Error al generar el reporte: " + e.getMessage());
         }
         
-    //GEN-LAST:event_btnReporteActionPerformed
+                                              
     }//GEN-LAST:event_btnReporteActionPerformed
+
+    private void txtValorEnNumeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtValorEnNumeroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtValorEnNumeroActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -484,13 +512,10 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnRegistrar;
     private javax.swing.JButton btnReporte;
-    private javax.swing.JComboBox<String> cbox_empleado;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label1;
     private javax.swing.JLabel label3;
-    private javax.swing.JLabel label4;
     private javax.swing.JLabel label5;
     private javax.swing.JLabel lb;
     private javax.swing.JLabel lb2;
@@ -498,6 +523,11 @@ resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdU
     private javax.swing.JTable tablaTipo_moneda;
     private javax.swing.JTextField txtTasa_cambio_usd;
     private javax.swing.JTextField txtTipo_moneda;
+    private javax.swing.JTextField txtValorEnNumero;
     private javax.swing.JTextField txtbuscado;
     // End of variables declaration//GEN-END:variables
+
+    private void aplicarPermisos(permisos permisosUsuarioActual) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

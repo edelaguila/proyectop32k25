@@ -46,10 +46,6 @@
 					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 			</frame>
-			<image>
-				<reportElement x="155" y="2" width="237" height="123" uuid="ddd428c7-3726-4210-a4fc-b7f92a0dcd89"/>
-				<imageExpression><![CDATA["C:\\Users\\Ruddyard\\Desktop\\semetre 1\\Progra3\\Repo Solo Grupo 1\\APARTADOPROYECTO\\proyectoumg\\Integracion\\ProyectoFinal\\src\\main\\java\\reporte\\banco\\imgLogoBanco.jpg"]]></imageExpression>
-			</image>
 		</band>
 	</title>
 	<columnHeader>

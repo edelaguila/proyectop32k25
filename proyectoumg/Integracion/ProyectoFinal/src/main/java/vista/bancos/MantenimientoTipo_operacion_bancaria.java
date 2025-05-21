@@ -1,86 +1,93 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package vista.bancos;
+package vista.bancos; // Declaración del paquete donde se encuentra esta clase
 
-import vista.seguridad.*;
-import Modelo.bancos.tipo_operacion_bancariaDAO;
-import Controlador.bancos.tipo_operacion_bancaria;
-import java.util.List;
-import javax.swing.table.DefaultTableModel;
-import java.io.File;
-import Controlador.seguridad.Bitacora;
-import Controlador.seguridad.UsuarioConectado;
-import Modelo.Conexion;
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.JOptionPane;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.view.JasperViewer;
+// Importaciones necesarias para funcionalidades de seguridad, base de datos, interfaz gráfica y reportes
+import Controlador.seguridad.UsuarioConectado;  // Para obtener el usuario actualmente conectado
+import Modelo.seguridad.UsuarioDAO;             // DAO para acceder a datos del usuario
+import Controlador.seguridad.permisos;          // Clase que representa los permisos del usuario
 
-//MANTENIMINETO CREADO POR Anderson Cristofer Rodríguez Pivaral 
+import vista.seguridad.*;                        // Importación de vistas relacionadas con seguridad
+import Modelo.bancos.tipo_operacion_bancariaDAO; // DAO para operaciones con tipo_operacion_bancaria
+import Controlador.bancos.tipo_operacion_bancaria; // Clase del modelo tipo_operacion_bancaria
+import java.util.List;                           // Para manejar listas de datos
+import javax.swing.table.DefaultTableModel;     // Modelo de tabla para JTable
+import java.io.File;                             // Para manejo de archivos
+import Controlador.seguridad.Bitacora;          // Para registrar acciones en bitácora
+import Controlador.seguridad.UsuarioConectado;  // (Repetido) Para obtener usuario actual
+import Modelo.Conexion;                          // Clase para manejar la conexión a la base de datos
+import java.sql.Connection;                      // Clase de conexión JDBC
+import java.util.HashMap;                        // Mapa para parámetros de reportes
+import java.util.Map;                            // Interfaz Map
+import javax.swing.JOptionPane;                  // Para mostrar cuadros de diálogo
+import net.sf.jasperreports.engine.*;            // Librerías para generar reportes JasperReports
+import net.sf.jasperreports.view.JasperViewer;   // Para visualizar reportes Jasper
+
+// MANTENIMIENTO CREADO POR Anderson Cristofer Rodríguez Pivaral
 
 /**
  *
  * @author visitante
  */
-public class MantenimientoTipo_operacion_bancaria extends javax.swing.JInternalFrame {
-int APLICACION=104;
+public class MantenimientoTipo_operacion_bancaria extends javax.swing.JInternalFrame { // Clase que extiende de JInternalFrame
+    int APLICACION = 109; // ID de la aplicación para bitácora
+    private Connection connectio; // Conexión a la base de datos
 
-    
-    public void llenadoDeCombos() {
-        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO();
-        List<tipo_operacion_bancaria> salon = tipo_operacion_bancariaDAO.select();
-        cbox_empleado.addItem("Seleccione una opción");
-        for (int i = 0; i < salon.size(); i++) {
-            cbox_empleado.addItem(salon.get(i).getTipo_operacion());
-        }
-    }
-    
+    // 🔒 Variables para permisos
+    private int idUsuarioSesion; // ID del usuario en sesión
+    private UsuarioDAO usuarioDAO; // DAO para usuarios
+    private permisos permisos; // Permisos del usuario
+    private permisos permisosUsuarioActual; // Permisos actuales del usuario
 
+    // Método para llenar la tabla con los datos de tipo_operacion_bancaria
     public void llenadoDeTablas() {
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.addColumn("id_tipo_operacion");
-        modelo.addColumn("tipo_operacion");
-        modelo.addColumn("descripcion");
-        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO();
-        List<tipo_operacion_bancaria> tipo_operaciones_bancarias = tipo_operacion_bancariaDAO.select();
-        tablaTipo_operacion_bancaria.setModel(modelo);
-        String[] dato = new String[3];
+        DefaultTableModel modelo = new DefaultTableModel(); // Crear modelo de tabla
+        modelo.addColumn("id_tipo_operacion"); // Columna ID
+        modelo.addColumn("tipo_operacion");    // Columna tipo de operación
+        modelo.addColumn("descripcion");       // Columna descripción
+
+        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO(); // DAO para tipo_operacion_bancaria
+        List<tipo_operacion_bancaria> tipo_operaciones_bancarias = tipo_operacion_bancariaDAO.select(); // Obtener lista desde BD
+        tablaTipo_operacion_bancaria.setModel(modelo); // Asignar modelo a la tabla
+
+        String[] dato = new String[3]; // Arreglo para almacenar datos de cada fila
         for (int i = 0; i < tipo_operaciones_bancarias.size(); i++) {
-            dato[0] = Integer.toString(tipo_operaciones_bancarias.get(i).getId_tipo_operacion());
-            //dato[0] = tipo_operaciones_bancarias.get(i).getId_tipo_operacion();
-            dato[1] = tipo_operaciones_bancarias.get(i).getTipo_operacion();
-            dato[2] = tipo_operaciones_bancarias.get(i).getDescripcion();
-            //System.out.println("vendedor:" + vendedores);
-            modelo.addRow(dato);
+            dato[0] = Integer.toString(tipo_operaciones_bancarias.get(i).getId_tipo_operacion()); // ID
+            dato[1] = tipo_operaciones_bancarias.get(i).getTipo_operacion(); // Tipo de operación
+            dato[2] = tipo_operaciones_bancarias.get(i).getDescripcion();    // Descripción
+            modelo.addRow(dato); // Agregar fila al modelo
         }
     }
 
+    // Método para buscar un tipo de operación bancaria específico
     public void buscarVendedor() {
-        tipo_operacion_bancaria tipo_operacionAConsultar = new tipo_operacion_bancaria();
-        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO();
-        tipo_operacionAConsultar.setId_tipo_operacion(Integer.parseInt(txtbuscado.getText()));
-        tipo_operacionAConsultar = tipo_operacion_bancariaDAO.query(tipo_operacionAConsultar);
-        txtTipo_operacion.setText(tipo_operacionAConsultar.getTipo_operacion());
-        txtDescripcion.setText(tipo_operacionAConsultar.getDescripcion());
-        int resultadoBitacora=0;
-        Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Buscar Datos tipo_operacion_bancaria");    
-   
+        tipo_operacion_bancaria tipo_operacionAConsultar = new tipo_operacion_bancaria(); // Crear objeto tipo_operacion_bancaria
+        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO(); // DAO para tipo_operacion_bancaria
+        tipo_operacionAConsultar.setId_tipo_operacion(Integer.parseInt(txtbuscado.getText())); // Establecer ID a buscar
+        tipo_operacionAConsultar = tipo_operacion_bancariaDAO.query(tipo_operacionAConsultar); // Consultar en BD
+
+        txtTipo_operacion.setText(tipo_operacionAConsultar.getTipo_operacion()); // Mostrar tipo de operación
+        txtDescripcion.setText(tipo_operacionAConsultar.getDescripcion());       // Mostrar descripción
+
+        int resultadoBitacora = 0; // Variable para resultado de bitácora
+        Bitacora bitacoraRegistro = new Bitacora(); // Crear objeto bitácora
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
+            UsuarioConectado.getIdUsuario(), APLICACION, "Buscar Datos tipo_operacion_bancaria"); // Registrar acción en bitácora
     }
 
+    // Constructor de la clase
     public MantenimientoTipo_operacion_bancaria() {
-        initComponents();
-        llenadoDeTablas();
-        llenadoDeCombos();
+        initComponents(); // Inicializar componentes gráficos
+        llenadoDeTablas(); // Llenar tabla al iniciar
+        // 🔐 Validación de permisos
+        idUsuarioSesion = UsuarioConectado.getIdUsuario(); // Obtener ID del usuario en sesión
+        usuarioDAO = new UsuarioDAO(); // Crear DAO de usuario
+        permisos = usuarioDAO.obtenerPermisosPorUsuario(idUsuarioSesion); // Obtener permisos del usuario
+
+        // Habilitar o deshabilitar botones según permisos
+        btnEliminar.setEnabled(permisos.isPuedeEliminar());
+        btnRegistrar.setEnabled(permisos.isPuedeRegistrar());
+        btnModificar.setEnabled(permisos.isPuedeModificar());
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -104,12 +111,9 @@ int APLICACION=104;
         btnLimpiar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaTipo_operacion_bancaria = new javax.swing.JTable();
-        cbox_empleado = new javax.swing.JComboBox<>();
-        label4 = new javax.swing.JLabel();
         txtDescripcion = new javax.swing.JTextField();
         label5 = new javax.swing.JLabel();
         lb = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         btnReporte = new javax.swing.JButton();
 
@@ -190,16 +194,6 @@ int APLICACION=104;
             tablaTipo_operacion_bancaria.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        cbox_empleado.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        cbox_empleado.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbox_empleadoActionPerformed(evt);
-            }
-        });
-
-        label4.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        label4.setText("Empleado:");
-
         txtDescripcion.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
         txtDescripcion.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
 
@@ -208,8 +202,6 @@ int APLICACION=104;
 
         lb.setForeground(new java.awt.Color(204, 204, 204));
         lb.setText(".");
-
-        jButton1.setText("jButton1");
 
         jButton2.setText("Ayuda");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -267,182 +259,183 @@ int APLICACION=104;
                         .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(62, 62, 62)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addGap(70, 70, 70)
-                                .addComponent(label4)
-                                .addGap(46, 46, 46)
-                                .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(48, 48, 48))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(label1)
-                                .addGap(253, 253, 253))))))
+                        .addGap(227, 227, 227)
+                        .addComponent(label1)
+                        .addGap(253, 253, 253))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(label1)
+                .addGap(4, 4, 4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(label1)
-                        .addGap(4, 4, 4)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lb)
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtTipo_operacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(label3))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(label5))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnRegistrar)
-                                    .addComponent(btnEliminar)
-                                    .addComponent(btnModificar))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnBuscar)
-                                    .addComponent(btnLimpiar))))
+                        .addComponent(lb)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label4)
-                                    .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jButton2)
-                                    .addComponent(btnReporte)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(jButton1)))
-                .addContainerGap(21, Short.MAX_VALUE))
+                            .addComponent(txtTipo_operacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(label3))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(label5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnRegistrar)
+                            .addComponent(btnEliminar)
+                            .addComponent(btnModificar))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtbuscado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnBuscar)
+                            .addComponent(btnLimpiar))))
+                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2)
+                    .addComponent(btnReporte))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // TODO add your handling code here:
-        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO();
-        tipo_operacion_bancaria tipo_operacionAEliminar = new tipo_operacion_bancaria();
-        tipo_operacionAEliminar.setId_tipo_operacion(Integer.parseInt(txtbuscado.getText()));
-        tipo_operacion_bancariaDAO.delete(tipo_operacionAEliminar);
-        llenadoDeTablas();
-         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
-        int resultadoBitacora=0;
-        Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Eliminar Datos tipo_operacion_bancaria");
-    
+                                                    
+    // Acción al presionar el botón Eliminar
+    tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO(); // Crear instancia del DAO
+    tipo_operacion_bancaria tipo_operacionAEliminar = new tipo_operacion_bancaria(); // Crear objeto tipo_operacion_bancaria
+    tipo_operacionAEliminar.setId_tipo_operacion(Integer.parseInt(txtbuscado.getText())); // Obtener ID desde el campo de texto
+    tipo_operacion_bancariaDAO.delete(tipo_operacionAEliminar); // Eliminar el registro en la base de datos
+    llenadoDeTablas(); // Actualizar la tabla con los datos restantes
+
+    UsuarioConectado usuarioEnSesion = new UsuarioConectado(); // Obtener usuario en sesión
+    int resultadoBitacora = 0; // Variable para resultado de bitácora
+    Bitacora bitacoraRegistro = new Bitacora(); // Crear objeto bitácora
+    resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
+        usuarioEnSesion.getIdUsuario(), APLICACION, "Eliminar Datos tipo_operacion_bancaria"); // Registrar acción en bitácora                                          
+
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO();
-        tipo_operacion_bancaria tipo_operacionAInsertar = new tipo_operacion_bancaria();
-        tipo_operacionAInsertar.setTipo_operacion(txtTipo_operacion.getText());
-        tipo_operacionAInsertar.setDescripcion(txtDescripcion.getText());
-        tipo_operacion_bancariaDAO.insert(tipo_operacionAInsertar);
-        llenadoDeTablas();
-        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
-        int resultadoBitacora=0;
-        Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Insertar Datos tipo_operacion_bancaria");
+                                                   
+    // Acción al presionar el botón Registrar
+    tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO(); // Crear instancia del DAO
+    tipo_operacion_bancaria tipo_operacionAInsertar = new tipo_operacion_bancaria(); // Crear objeto tipo_operacion_bancaria
+    tipo_operacionAInsertar.setTipo_operacion(txtTipo_operacion.getText()); // Establecer tipo de operación desde campo de texto
+    tipo_operacionAInsertar.setDescripcion(txtDescripcion.getText()); // Establecer descripción desde campo de texto
+    tipo_operacion_bancariaDAO.insert(tipo_operacionAInsertar); // Insertar nuevo registro en la base de datos
+    llenadoDeTablas(); // Actualizar la tabla con los nuevos datos
+
+    UsuarioConectado usuarioEnSesion = new UsuarioConectado(); // Obtener usuario en sesión
+    int resultadoBitacora = 0; // Variable para resultado de bitácora
+    Bitacora bitacoraRegistro = new Bitacora(); // Crear objeto bitácora
+    resultadoBitacora = bitacoraRegistro.setIngresarBitacora(
+        usuarioEnSesion.getIdUsuario(), APLICACION, "Insertar Datos tipo_operacion_bancaria"); // Registrar acción en bitácora
+
+
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
-        buscarVendedor();
+        // Acción al presionar el botón Buscar
+        buscarVendedor(); // Llamar al método que realiza la búsqueda
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-//        // TODO add your handling code here:
-        tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO();
-        tipo_operacion_bancaria tipo_operacionAActualizar = new tipo_operacion_bancaria();
-        tipo_operacionAActualizar.setId_tipo_operacion(Integer.parseInt(txtbuscado.getText()));
-        tipo_operacionAActualizar.setTipo_operacion(txtTipo_operacion.getText());
-        tipo_operacionAActualizar.setDescripcion(txtDescripcion.getText());
-        tipo_operacion_bancariaDAO.update(tipo_operacionAActualizar);
-        llenadoDeTablas();
-        int resultadoBitacora=0;
-        Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Modificar Datos tipo_operacion_bancaria");    
+                                            
+    // Acción al presionar el botón Modificar
+    tipo_operacion_bancariaDAO tipo_operacion_bancariaDAO = new tipo_operacion_bancariaDAO(); // Crear instancia del DAO
+    tipo_operacion_bancaria tipo_operacionAActualizar = new tipo_operacion_bancaria(); // Crear objeto tipo_operacion_bancaria
+    tipo_operacionAActualizar.setId_tipo_operacion(Integer.parseInt(txtbuscado.getText())); // Obtener ID desde campo de texto
+    tipo_operacionAActualizar.setTipo_operacion(txtTipo_operacion.getText()); // Obtener nuevo tipo de operación
+    tipo_operacionAActualizar.setDescripcion(txtDescripcion.getText()); // Obtener nueva descripción
+    tipo_operacion_bancariaDAO.update(tipo_operacionAActualizar); // Actualizar el registro en la base de datos
+    llenadoDeTablas(); // Actualizar la tabla con los datos modificados
+
+    int resultadoBitacora = 0; // Variable para resultado de bitácora
+    Bitacora bitacoraRegistro = new Bitacora(); // Crear objeto bitácora
+    resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION, "Modificar Datos tipo_operacion_bancaria"); // Registrar acción en bitácora
+
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        cbox_empleado.setSelectedIndex(0);
-        txtTipo_operacion.setText("");
-        txtDescripcion.setText("");
-        txtbuscado.setText("");
-        btnRegistrar.setEnabled(true);
-        btnModificar.setEnabled(true);
-        btnEliminar.setEnabled(true);
+
+    // Recorre todos los componentes dentro del panel principal//NUEVO METODO FUNCIONAL
+    for (java.awt.Component comp : this.getContentPane().getComponents()) {
+        if (comp instanceof javax.swing.JTextField) {
+            ((javax.swing.JTextField) comp).setText("");
+        } else if (comp instanceof javax.swing.JComboBox) {
+            ((javax.swing.JComboBox<?>) comp).setSelectedIndex(0);
+        }
+    }
+    // Aquí se habilitan los botones según los permisos actuales, no todos en true
+    aplicarPermisos(permisosUsuarioActual);
+
+
+    // botones estén habilitados
+    btnRegistrar.setEnabled(true);
+    btnModificar.setEnabled(true);
+    btnEliminar.setEnabled(true);
+
+    System.out.println("Todos los campos han sido limpiados automáticamente.");
+      UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Limpiar Datos tipo_operacion_bancaria");    
-   
-
-        // TODO add your handling code here:
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Limpiar OPERACION BANCARIA");
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
-    private void cbox_empleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbox_empleadoActionPerformed
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbox_empleadoActionPerformed
-/*
-     // TODO add your handling code here:
-        MantenimientoAula ventana = new MantenimientoAula();
-        jDesktopPane1.add(ventana);
-        Dimension desktopSize = jDesktopPane1.getSize();
-        Dimension FrameSize = ventana.getSize();
-        ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
-    */
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        try {
-            if ((new File("src\\main\\java\\ayudas\\ProcesoMayor.chm")).exists()) {
-                Process p = Runtime
-                        .getRuntime()
-                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\ProcesoMayor.chm");
-                p.waitFor();
-            } else {
-                System.out.println("La ayuda no Fue encontrada");
-            }
-            System.out.println("Correcto");
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    // Acción al presionar el botón de ayuda
+    try {
+        // Verifica si el archivo de ayuda existe en la ruta especificada
+        if ((new File("src\\main\\java\\ayudas\\banco\\AyudaBanco.chm")).exists()) {
+            // Ejecuta el archivo de ayuda utilizando el sistema operativo
+            Process p = Runtime
+                    .getRuntime()
+                    .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\banco\\AyudaBanco.chm");
+            p.waitFor(); // Espera a que el proceso termine
+        } else {
+            // Mensaje en consola si el archivo no se encuentra
+            System.out.println("La ayuda no Fue encontrada");
         }
+        // Mensaje en consola si todo fue correcto
+        System.out.println("Correcto");
+    } catch (Exception ex) {
+        // Imprime el error en caso de excepción
+        ex.printStackTrace();
+    }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
-        // TODO add your handling code here:
-                       Map p = new HashMap();
-        JasperReport report;
-        JasperPrint print;
+    // Acción al presionar el botón de generar reporte
+    Map p = new HashMap(); // Mapa para parámetros del reporte
+    JasperReport report; // Objeto para el reporte compilado
+    JasperPrint print;   // Objeto para el reporte generado
 
-        try {
-                           Connection connectio = Conexion.getConnection();
-            report = JasperCompileManager.compileReport(new File("").getAbsolutePath()
-                    + "/src/main/java/reporte/banco/reporteTipoOperacionBancaria.jrxml");
-//
-            print = JasperFillManager.fillReport(report, p, connectio);
+    try {
+        // Obtener conexión a la base de datos
+        Connection connectio = Conexion.getConnection();
 
-            JasperViewer view = new JasperViewer(print, false);
+        // Compilar el archivo .jrxml del reporte desde su ruta
+        report = JasperCompileManager.compileReport(new File("").getAbsolutePath()
+                + "/src/main/java/reporte/banco/ReporteTipoOperacionBancaria.jrxml");
 
-            view.setTitle("Prueba reporte");
-            view.setVisible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error al generar el reporte: " + e.getMessage());
-        }
+        // Llenar el reporte con los datos y parámetros
+        print = JasperFillManager.fillReport(report, p, connectio);
+
+        // Crear una vista del reporte generado
+        JasperViewer view = new JasperViewer(print, false);
+
+        // Establecer título de la ventana del reporte
+        view.setTitle("Prueba reporte");
+        view.setVisible(true); // Mostrar la ventana del reporte
+    } catch (Exception e) {
+        // Imprimir error en consola y mostrar mensaje al usuario
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al generar el reporte: " + e.getMessage());
+    }
         
-    //GEN-LAST:event_btnReporteActionPerformed
+                                              
     }//GEN-LAST:event_btnReporteActionPerformed
 
 
@@ -453,13 +446,10 @@ int APLICACION=104;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnRegistrar;
     private javax.swing.JButton btnReporte;
-    private javax.swing.JComboBox<String> cbox_empleado;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label1;
     private javax.swing.JLabel label3;
-    private javax.swing.JLabel label4;
     private javax.swing.JLabel label5;
     private javax.swing.JLabel lb;
     private javax.swing.JLabel lb2;
@@ -469,4 +459,8 @@ int APLICACION=104;
     private javax.swing.JTextField txtTipo_operacion;
     private javax.swing.JTextField txtbuscado;
     // End of variables declaration//GEN-END:variables
+
+    private void aplicarPermisos(permisos permisosUsuarioActual) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

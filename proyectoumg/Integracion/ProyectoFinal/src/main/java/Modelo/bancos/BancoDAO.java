@@ -148,4 +148,30 @@ public class BancoDAO {
 
         return banco;
     }
+
+    public boolean existeBanco(int idBanco) {
+        String sql = "SELECT 1 FROM banco WHERE id_banco = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        boolean existe = false;
+
+        try {
+            conn = Conexion.getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, idBanco);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                existe = true;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(System.out);
+        } finally {
+            Conexion.close(rs);
+            Conexion.close(stmt);
+            Conexion.close(conn);
+        }
+
+        return existe;
+    }
 }

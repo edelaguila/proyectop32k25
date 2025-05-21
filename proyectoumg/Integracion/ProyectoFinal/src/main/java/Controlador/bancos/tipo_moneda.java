@@ -6,27 +6,18 @@ package Controlador.bancos;
 // Se usó encapsulate field para getter y setter
 
 public class tipo_moneda {
-
     private int id_tipo_moneda;
     private String tipo_moneda;
-    private double tasa_cambio_usd;
-
+    private int id_tasa_cambio_diario;
+    private double valor_tasa_cambio;
+    
     public tipo_moneda() {
     }
 
-    public tipo_moneda(int id_tipo_moneda, String tipo_moneda, double tasa_cambio_usd) {
+    public tipo_moneda(int id_tipo_moneda, String tipo_moneda, int id_tasa_cambio_diario) {
         this.id_tipo_moneda = id_tipo_moneda;
         this.tipo_moneda = tipo_moneda;
-        this.tasa_cambio_usd = tasa_cambio_usd;
-    }
-
-    @Override
-    public String toString() {
-        return "tipo_moneda{" + 
-               "id_tipo_moneda=" + id_tipo_moneda + 
-               ", tipo_moneda='" + tipo_moneda + '\'' + 
-               ", tasa_cambio_usd=" + tasa_cambio_usd + 
-               '}';
+        this.id_tasa_cambio_diario = id_tasa_cambio_diario;
     }
 
     public int getId_tipo_moneda() {
@@ -45,12 +36,25 @@ public class tipo_moneda {
         this.tipo_moneda = tipo_moneda;
     }
 
-    public double getTasa_cambio_usd() {
-        return tasa_cambio_usd;
+    public int getId_tasa_cambio_diario() {
+        return id_tasa_cambio_diario;
     }
 
-    public void setTasa_cambio_usd(double tasa_cambio_usd) {
-        this.tasa_cambio_usd = tasa_cambio_usd;
+    public void setId_tasa_cambio_diario(int id_tasa_cambio_diario) {
+        this.id_tasa_cambio_diario = id_tasa_cambio_diario;
+    }
+
+    @Override
+    public String toString() {
+        return "tipo_moneda{" + "id_tipo_moneda=" + id_tipo_moneda + ", tipo_moneda=" + tipo_moneda + ", id_tasa_cambio_diario=" + id_tasa_cambio_diario + '}';
+    }
+
+    public double getValor_tasa_cambio() {
+        return valor_tasa_cambio;
+    }
+
+    public void setValor_tasa_cambio(double valor_tasa_cambio) {
+        this.valor_tasa_cambio = valor_tasa_cambio;
     }
 }
 

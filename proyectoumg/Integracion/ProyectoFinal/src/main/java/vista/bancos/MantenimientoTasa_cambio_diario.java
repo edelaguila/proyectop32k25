@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package vista.bancos;
+import Controlador.seguridad.UsuarioConectado;  // Para obtener usuario actual
+import Modelo.seguridad.UsuarioDAO;               // Para manejar la lógica de usuario (ajusta el paquete si es otro)
+import Controlador.seguridad.permisos;          // La clase que representa los permisos del usuario (ajusta el paquete)
 
 import Controlador.bancos.tasa_cambio_diario;
 import vista.seguridad.*;
@@ -14,8 +17,10 @@ import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import Controlador.seguridad.Bitacora;
 import Controlador.seguridad.UsuarioConectado;
+import Controlador.seguridad.permisos;
 import Modelo.Conexion;
 import Modelo.bancos.tasa_cambio_diarioDAO;
+import Modelo.seguridad.UsuarioDAO;
 import java.awt.Color;
 import java.sql.Connection;
 import java.time.LocalDateTime;
@@ -32,13 +37,35 @@ import net.sf.jasperreports.view.JasperViewer;
 
 //MANTENIMINETO CREADO POR Ruddyard Eduardo Castro Chavez 
 
+
 /**
- *
- * @author visitante
+ * Clase para mantenimiento de tasas de cambio diario (Interfaz gráfica)
+ * 
+ * Funcionalidades principales:
+ * - Llenado de tablas con tasas existentes
+ * - Búsqueda de tasas por ID
+ * - Validación de permisos de usuario
+ * - Manejo de formato de fecha/hora
+ * 
+ * Componentes:
+ * - Tabla para visualización
+ * - Campos para búsqueda/registro
+ * - Botones CRUD con control de permisos
+ * 
+ * Seguridad:
+ * - Control de acceso por permisos
+ * - Registro en bitácora de acciones
  */
 public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame {
 
      int APLICACION = 105; // Ajustar según corresponda
+        private Connection connectio;
+    // 🔒 Variables para permisos
+    private int idUsuarioSesion;
+    private UsuarioDAO usuarioDAO;
+    private permisos permisos;
+
+private permisos permisosUsuarioActual; 
     private tasa_cambio_diarioDAO tasaDAO = new tasa_cambio_diarioDAO();
 
     public void llenadoDeCombos() {
@@ -105,6 +132,17 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
     });
         llenadoDeTablas();
         llenadoDeCombos();
+    // 🔐 Validación de permisos
+       idUsuarioSesion = UsuarioConectado.getIdUsuario();
+
+        usuarioDAO = new UsuarioDAO();
+        permisos = usuarioDAO.obtenerPermisosPorUsuario(idUsuarioSesion);
+
+        
+        btnEliminar.setEnabled(permisos.isPuedeEliminar());
+        btnRegistrar.setEnabled(permisos.isPuedeRegistrar());
+        btnModificar.setEnabled(permisos.isPuedeModificar());
+
     }
 
     /**
@@ -352,6 +390,19 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
+        /**
+ * Elimina una tasa de cambio por ID y actualiza la tabla
+ * 
+ * Pasos:
+ * 1. Crea objeto tasa con ID del campo txtbuscado
+ * 2. Ejecuta eliminación a través del DAO
+ * 3. Refresca datos en tabla
+ * 4. Registra acción en bitácora
+ * 
+ * Seguridad:
+ * - El botón Eliminar ya tiene validación de permisos
+ * - Registra la acción con usuario y aplicación
+ */
       tasa_cambio_diario tasaEliminar = new tasa_cambio_diario();
         tasaEliminar.setId_tasa_cambio_diario(Integer.parseInt(txtbuscado.getText()));
         tasaDAO.delete(tasaEliminar);
@@ -381,6 +432,7 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
            txtFechaHora.getForeground().equals(Color.GRAY)) {
             fechaHora = LocalDateTime.now();
             // Mostrar la fecha actual como texto guía visible
+            /* Ejecuta código en el hilo de la interfaz gráfica (Swing EDT) */
             SwingUtilities.invokeLater(() -> {
                 txtFechaHora.setText(formatter.format(fechaHora));
                 txtFechaHora.setForeground(Color.BLACK);
@@ -441,19 +493,30 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        cbox_empleado.setSelectedIndex(0);
-        txtValorPromedio.setText("");
-        txtFechaHora.setText("");
-        txtbuscado.setText("");
-        btnRegistrar.setEnabled(true);
-        btnModificar.setEnabled(true);
-        btnEliminar.setEnabled(true);
+
+    // Recorre todos los componentes dentro del panel principal//NUEVO METODO FUNCIONAL
+    for (java.awt.Component comp : this.getContentPane().getComponents()) {
+        if (comp instanceof javax.swing.JTextField) {
+            ((javax.swing.JTextField) comp).setText("");
+        } else if (comp instanceof javax.swing.JComboBox) {
+            ((javax.swing.JComboBox<?>) comp).setSelectedIndex(0);
+        }
+    }
+    // Aquí se habilitan los botones según los permisos actuales, no todos en true
+    aplicarPermisos(permisosUsuarioActual);
+
+
+    // botones estén habilitados
+    btnRegistrar.setEnabled(true);
+    btnModificar.setEnabled(true);
+    btnEliminar.setEnabled(true);
+
+    System.out.println("Todos los campos han sido limpiados automáticamente.");
+      UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Limpiar Datos Tasa de Cambio Diario");    
-   
-
-        // TODO add your handling code here:
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Limpiar TASA DE CAMBIO");
+  // TODO add your handling code here:
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void cbox_empleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbox_empleadoActionPerformed
@@ -471,10 +534,10 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         try {
-            if ((new File("src\\main\\java\\ayudas\\ProcesoMayor.chm")).exists()) {
+            if ((new File("src\\main\\java\\ayudas\\banco\\AyudasTasaCambioDiario.chm")).exists()) {
                 Process p = Runtime
                         .getRuntime()
-                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\ProcesoMayor.chm");
+                        .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\banco\\AyudasTasaCambioDiario.chm");
                 p.waitFor();
             } else {
                 System.out.println("La ayuda no Fue encontrada");
@@ -507,7 +570,7 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
             JOptionPane.showMessageDialog(this, "Error al generar el reporte: " + e.getMessage());
         }
         
-    //GEN-LAST:event_btnReporteActionPerformed
+                                              
     }//GEN-LAST:event_btnReporteActionPerformed
 
 
@@ -534,4 +597,8 @@ public class MantenimientoTasa_cambio_diario extends javax.swing.JInternalFrame 
     private javax.swing.JTextField txtValorPromedio;
     private javax.swing.JTextField txtbuscado;
     // End of variables declaration//GEN-END:variables
+
+    private void aplicarPermisos(permisos permisosUsuarioActual) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
