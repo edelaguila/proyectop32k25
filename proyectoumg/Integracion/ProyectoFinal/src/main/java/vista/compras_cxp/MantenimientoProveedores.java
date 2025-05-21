@@ -586,6 +586,11 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         ProveedorDAO proveedorDAO = new ProveedorDAO();
         //Se llama el metodo para imprimir un reporte
         proveedorDAO.imprimirReporte(); 
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Visualizar reporte Proveedores");
     }//GEN-LAST:event_txtReporteActionPerformed
     
     //Boton ayuda
@@ -608,7 +613,12 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         } catch (Exception ex) {
             // En caso de error, imprime la traza para diagnóstico
             ex.printStackTrace();
-        }  
+        } 
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Gestion Ayuda Proveedores");
     }//GEN-LAST:event_txtAyudaActionPerformed
 
     

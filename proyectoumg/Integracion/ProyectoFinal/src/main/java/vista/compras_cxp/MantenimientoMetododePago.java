@@ -459,6 +459,11 @@ public class MantenimientoMetododePago extends javax.swing.JInternalFrame {
             // En caso de error, imprime la traza para diagnóstico
             ex.printStackTrace();
         }  
+       
+       UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Gestion Ayuda MetodoDePago");
     }//GEN-LAST:event_jButton2ActionPerformed
     
     private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
@@ -488,6 +493,11 @@ public class MantenimientoMetododePago extends javax.swing.JInternalFrame {
         MetododepagoDAO metododepagoDAO = new MetododepagoDAO();
         //Llamado al metodo de imprimir reporte
         metododepagoDAO.imprimirReporte(); 
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Visualizar reporte MetodoDePago");
     }//GEN-LAST:event_ReporteActionPerformed
 
 

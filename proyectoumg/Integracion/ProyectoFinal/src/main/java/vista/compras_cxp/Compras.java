@@ -13,7 +13,9 @@ import Modelo.compras_cxp.Compras_cppDAO;
 import Controlador.compras_cxp.Proveedor;
 import Controlador.compras_cxp.Compra_cpp;
 import Controlador.inventarios.productos;
+import Controlador.seguridad.Bitacora;
 import Controlador.seguridad.Perfil;
+import Controlador.seguridad.UsuarioConectado;
 import Modelo.inventarios.ProductosDAO;
 import Modelo.seguridad.PerfilDAO;
 import java.io.File;
@@ -30,6 +32,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
+//Bitacora Implemenrada por Oscar Morales
+import Controlador.seguridad.Bitacora;
+import Controlador.seguridad.UsuarioConectado;
+
 /**
  *
  * @author oscar
@@ -37,6 +43,9 @@ import javax.swing.JTable;
 
 //Declaracion de la clase compras
 public class Compras extends javax.swing.JInternalFrame {
+    
+        //Codigo de la aplicacion mantenimiento compras
+        final int APLICACION=204;
         // Despliegue de id proveedor en combobox ----- HECHO POR KATHIA CONTRERAS 8246
         public void llenadoDeCombos() {
         // instancia de ProveedorDAO
@@ -516,6 +525,7 @@ public class Compras extends javax.swing.JInternalFrame {
         txtplazo.setVisible(false);
         exis.setEditable(false);
         codiprotxt.setVisible(false);
+        resul.setEditable(false);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -643,6 +653,10 @@ public class Compras extends javax.swing.JInternalFrame {
         
         //agregado de suma total
         
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Ingreso Compra");
         
         
     }//GEN-LAST:event_agregaActionPerformed
@@ -678,6 +692,10 @@ public class Compras extends javax.swing.JInternalFrame {
              // En caso de error, imprime la traza para diagnóstico
             ex.printStackTrace();
         }  
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Gestion Ayuda Compras");
     }//GEN-LAST:event_BAyudasActionPerformed
         
     private void ReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReporteActionPerformed
@@ -687,6 +705,11 @@ public class Compras extends javax.swing.JInternalFrame {
     Compras_cppDAO compras_cppDAO = new Compras_cppDAO();
     // Llama al método que genera e imprime el reporte de compras
     compras_cppDAO.imprimirReporte();
+    
+            UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Visualizar reporte Compras");
     }//GEN-LAST:event_ReporteActionPerformed
 
     private void cantidadtxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cantidadtxtActionPerformed
