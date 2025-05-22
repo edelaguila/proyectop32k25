@@ -10,8 +10,12 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import Controlador.seguridad.Bitacora;
+import Controlador.seguridad.RelPerfApl;
+import Controlador.seguridad.RelPerfUsu;
 import Controlador.seguridad.UsuarioConectado;
 import Modelo.Conexion;
+import Modelo.seguridad.RelPerfAplDAO;
+import Modelo.seguridad.RelPerfUsuDAO;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +31,19 @@ import net.sf.jasperreports.view.JasperViewer;
  */
 public class MantenimientoClientes extends javax.swing.JInternalFrame {
     
-    final int APLICACION=225;
+    final int APLICACION=330;
  public void llenadoDeCombos() {
         ClientesDAO clienteDAO = new ClientesDAO();
         List<Clientes> salon = clienteDAO.select();
-        cbox_empleado.addItem("Seleccione una opción");
+ /*       cbox_empleado.addItem("Seleccione una opción");
         for (int i = 0; i < salon.size(); i++) {
             cbox_empleado.addItem(salon.get(i).getNombre_cliente());
+     
         }
-    }
+    */
+ 
+ }
+  
     public void llenadoDeTablas() {
         DefaultTableModel modelo = new DefaultTableModel();
         modelo.addColumn("ID cliente");
@@ -74,6 +82,78 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         }
     }
 
+     public void seguridad_botones(){
+     RelPerfUsuDAO relPerfUsuDAO = new RelPerfUsuDAO();
+    List<RelPerfUsu> productos_ls = relPerfUsuDAO.select(); 
+    
+    RelPerfAplDAO relPerfAplDAO = new RelPerfAplDAO();
+    List<RelPerfApl> ApliUsu = relPerfAplDAO.select(); 
+   
+        
+            int idusuarioC = UsuarioConectado.getIdUsuario();
+            String eli;
+            String mod;
+             String reg;
+             String rep;
+             String bus;
+            if (idusuarioC != 0) {
+                // Buscar el ID de la aplicación seleccionada
+                for (RelPerfUsu app : productos_ls) {
+                    //valida si el idUsuario de la BDD es igual al usiario conectado al sistema
+                    if (app.getUsuario_codigo()==(idusuarioC)) {
+                        //si esto es verdadero obtendentremos el perfil que esta vinculado con ese codigo de usuario
+                        int Idperfil = app.getPerfil_codigo(); //se declara la variable de idperfil                                                                                                       
+                     for (RelPerfApl app2 : ApliUsu) {//recorrera la tabla RelperfApli
+                        int Idaplicacion = app2.getAplicacion_codigo(); 
+                        //si el PC de la BDD es identico a IDperfil obtenido y el CA de la BDD es identico al IDaplicacion obtenido
+                           if (app2.getPerfil_codigo()==(Idperfil)&&(app2.getAplicacion_codigo()==Idaplicacion)) {
+                      //obtendra los valores de los siguientes campos
+                        eli = app2.getEliminar_rpa();
+                        mod = app2.getActualizar_rpa();
+                        reg = app2.getInsertar_rpa();
+                        rep = app2.getImprimir_rpa();
+                        bus = app2.getConsultar_rpa();
+                       
+                          
+                       //validacion para habilitar los botones
+                       if(Idaplicacion==APLICACION){
+                        if("1".equals(reg)){
+            habilitarRegistrar(true);
+        } else {
+          habilitarRegistrar(false); 
+        }
+        if("1".equals(eli)){
+            habilitarEliminar(true);
+        } else {
+            habilitarEliminar(false);
+        }
+        if("1".equals(mod)){
+            habilitarModificar(true);
+        } else {
+            habilitarModificar(false);
+        }
+        if("1".equals(rep)){
+            habilitarReportes(true);
+        } else {
+           habilitarReportes(false);
+        }
+        if("1".equals(bus)){
+            habilitarBuscar(true);
+        } else {
+           habilitarBuscar(false);
+        }
+        }
+                         
+                      
+                    
+                    }
+                   }
+                       
+                    }   
+                }   
+             
+            }
+    }
     public void buscarPerfil() {
         Clientes clienteAConsultar = new Clientes();
         ClientesDAO clienteDAO = new ClientesDAO();
@@ -95,11 +175,30 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Consulta Datos clientes");
     }
+    public void habilitarEliminar(boolean habilitado) {
+        btnEliminar.setEnabled(habilitado);
+    }
+    
+    public void habilitarRegistrar(boolean habilitado) {
+        btnRegistrar.setEnabled(habilitado);
+    }
+    
+    public void habilitarBuscar(boolean habilitado) {
+        btnBuscar.setEnabled(habilitado);
+    }
+    
+    public void habilitarModificar(boolean habilitado) {
+        btnModificar.setEnabled(habilitado);
+    }
+    public void habilitarReportes(boolean habilitado) {
+        reportes.setEnabled(habilitado);
+    }
 
     public MantenimientoClientes() {
         initComponents();
         llenadoDeTablas();
          llenadoDeCombos();
+         seguridad_botones();
         //se quito el llena combos al no contar con empleados
     }
 
@@ -125,8 +224,6 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         btnLimpiar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaSedes = new javax.swing.JTable();
-        cbox_empleado = new javax.swing.JComboBox<>();
-        label4 = new javax.swing.JLabel();
         lb = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -146,7 +243,7 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         txtEstatus = new javax.swing.JTextField();
         txtDCreditos = new javax.swing.JTextField();
         label12 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        reportes = new javax.swing.JButton();
 
         lb2.setForeground(new java.awt.Color(204, 204, 204));
         lb2.setText(".");
@@ -155,10 +252,11 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Mantenimiento Sede");
+        setTitle("Mantenimiento Clientes");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");
+        btnEliminar.setEnabled(false);
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEliminarActionPerformed(evt);
@@ -166,6 +264,7 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         });
 
         btnRegistrar.setText("Registrar");
+        btnRegistrar.setEnabled(false);
         btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRegistrarActionPerformed(evt);
@@ -173,6 +272,7 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         });
 
         btnBuscar.setText("Buscar");
+        btnBuscar.setEnabled(false);
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuscarActionPerformed(evt);
@@ -183,6 +283,7 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         label1.setText("Clientes");
 
         btnModificar.setText("Modificar");
+        btnModificar.setEnabled(false);
         btnModificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnModificarActionPerformed(evt);
@@ -225,16 +326,6 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
             }
         });
         jScrollPane1.setViewportView(tablaSedes);
-
-        cbox_empleado.setFont(new java.awt.Font("Century Gothic", 0, 12)); // NOI18N
-        cbox_empleado.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbox_empleadoActionPerformed(evt);
-            }
-        });
-
-        label4.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
-        label4.setText("Clientes:");
 
         lb.setForeground(new java.awt.Color(204, 204, 204));
         lb.setText(".");
@@ -301,10 +392,11 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         label12.setFont(new java.awt.Font("Century Gothic", 1, 12)); // NOI18N
         label12.setText("Dias Credito");
 
-        jButton3.setText("Reportes");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        reportes.setText("Reportes");
+        reportes.setEnabled(false);
+        reportes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                reportesActionPerformed(evt);
             }
         });
 
@@ -393,12 +485,8 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
                         .addGap(38, 38, 38)
                         .addComponent(jButton2)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(label4)
-                        .addGap(46, 46, 46)
-                        .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(48, 48, 48))))
+                        .addComponent(reportes)
+                        .addGap(48, 434, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -461,13 +549,9 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton1))
                         .addGap(58, 58, 58)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(label4)
-                                .addComponent(cbox_empleado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jButton2)
-                                .addComponent(jButton3)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton2)
+                            .addComponent(reportes))
                         .addGap(0, 30, Short.MAX_VALUE)))
                 .addGap(21, 21, 21))
         );
@@ -534,11 +618,12 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Actualizacion Datos Perfiles");
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Actualizacion Datos Clientes");
+        
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        cbox_empleado.setSelectedIndex(0);
+        //cbox_empleado.setSelectedIndex(0);
         txtApellido.setText("");
         txtDireccion.setText("");
         txtbuscado.setText("");
@@ -553,13 +638,15 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         btnModificar.setEnabled(true);
         btnEliminar.setEnabled(true);
 
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Actualizacion Datos Clientes");
+        
+        
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLimpiarActionPerformed
-
-    private void cbox_empleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbox_empleadoActionPerformed
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbox_empleadoActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
@@ -576,6 +663,12 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Ayuda Clientes");
+        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void txtApellidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtApellidoActionPerformed
@@ -586,7 +679,7 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNombreActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void reportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reportesActionPerformed
         // TODO add your handling code here:
         Map p = new HashMap();
         JasperReport report;
@@ -605,8 +698,13 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
             view.setVisible(true);
         } catch (Exception e) {
         }
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Reporte Clientes");
         
-    }//GEN-LAST:event_jButton3ActionPerformed
+        
+    }//GEN-LAST:event_reportesActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -615,17 +713,14 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JButton btnRegistrar;
-    private javax.swing.JComboBox<String> cbox_empleado;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label1;
     private javax.swing.JLabel label10;
     private javax.swing.JLabel label11;
     private javax.swing.JLabel label12;
     private javax.swing.JLabel label3;
-    private javax.swing.JLabel label4;
     private javax.swing.JLabel label5;
     private javax.swing.JLabel label6;
     private javax.swing.JLabel label7;
@@ -634,6 +729,7 @@ public class MantenimientoClientes extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lb;
     private javax.swing.JLabel lb2;
     private javax.swing.JLabel lbusu;
+    private javax.swing.JButton reportes;
     private javax.swing.JTable tablaSedes;
     private javax.swing.JTextField txtASaldo;
     private javax.swing.JTextField txtApellido;
