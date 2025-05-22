@@ -186,7 +186,7 @@ cboperfil1.addActionListener(e -> {
         ProductosDAO productosDAO = new ProductosDAO();
         productos producto = productosDAO.getById(idProducto);
         
-       /* VentascxcDAO ventasDAO = new VentascxcDAO();
+        VentascxcDAO ventasDAO = new VentascxcDAO();
         Ventascxc ultimaVenta = ventasDAO.UltiVenta(idCliente);
         
         double saldoActual;
@@ -227,7 +227,7 @@ cboperfil1.addActionListener(e -> {
             return;
         }
         
-*/
+
         // Crear objeto venta
         Ventascxc venta = new Ventascxc();
         
@@ -262,17 +262,6 @@ cboperfil1.addActionListener(e -> {
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
             actualizarTablaVentas();
          
-               /*txtper.setText(" ");
-                txtproducto.setText(" ");
-                DefaultListModel model = (DefaultListModel)  lstAplicA.getModel();
-                model.clear();  
-                txtprcioproducto.setText(" ");
-                txtper1.setText("");
-                txtper1.requestFocus();
-                fechav.setText(" ");
-                fechav.setText(" ");
-                exitxt.setText(" ");
-            */
         } else {
             JOptionPane.showMessageDialog(this, "Error al generar la venta", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -941,12 +930,12 @@ private int numG;
         
       // Asignar la fecha al objeto
         ventasconfirmar.setFecha_venta(fechaFormateada); 
-       /* 
+       
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Generando Venta");    
-   */
+   
        
        
        
@@ -955,13 +944,13 @@ private int numG;
      
      
     }//GEN-LAST:event_btnEditarActionPerformed
- /*
+ 
     private int generaNum() {
     int min = 001;  // Valor mínimo
     int max = 100;  // Valor máximo
     return (int) (Math.random() * (max - min + 1) + min);
 }
- */
+ 
     
     private void lstAplicDComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_lstAplicDComponentAdded
         // TODO add your handling code here:
