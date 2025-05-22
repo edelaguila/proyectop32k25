@@ -10,6 +10,7 @@ package Controlador.ventas_cxc;
  * @author visitante
  */
 public class Vendedores {
+    //Sofia
 
     int id_vendedor;
     String nombre_vendedor;

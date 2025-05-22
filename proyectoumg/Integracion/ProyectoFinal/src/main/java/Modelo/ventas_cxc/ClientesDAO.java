@@ -46,7 +46,7 @@ public class ClientesDAO {
                 String direccion_cliente = rs.getString("direccion_cliente");
                 String telefono_cliente = rs.getString("telefono_cliente");
                 String email_cliente = rs.getString("email_cliente");
-                Double limite_creditoCLE = rs.getDouble("limite_credito");
+                double limite_creditoCLE = rs.getDouble("limite_credito");
                 int dias_credito = rs.getInt("dias_credito");
                 String estatus_cliente = rs.getString("estatus_cliente");
                 Double saldo_actual = rs.getDouble("saldo_actual");
@@ -187,7 +187,7 @@ public class ClientesDAO {
                 String direccion_cliente = rs.getString("direccion_cliente");
                 String telefono_cliente = rs.getString("telefono_cliente");
                 String email_cliente = rs.getString("email_cliente");
-                Double limite_creditoCLE = rs.getDouble("limite_credito");
+                double limite_creditoCLE = rs.getDouble("limite_credito");
                 int dias_credito = rs.getInt("dias_credito");
                 String estatus_cliente = rs.getString("estatus_cliente");
                 Double saldo_actual = rs.getDouble("saldo_actual");
@@ -240,9 +240,10 @@ public class ClientesDAO {
             cliente.setId_cliente(rs.getInt("id_cliente"));
             cliente.setNombre_cliente(rs.getString("nombre_cliente"));
             cliente.setApellido_cliente(rs.getString("apellido_cliente"));
-            cliente.setDias_credito_CLE(rs.getInt("dias_credito")); // Asegúrate que este campo existe
+            cliente.setLimite_credito_CLE(rs.getDouble("limite_credito"));
+            cliente.setDias_credito_CLE(rs.getInt("dias_credito"));// Asegúrate que este campo existe
             cliente.setSaldo_actual_CLE(rs.getDouble("saldo_actual")); // Asegúrate que este campo existe
-            // Agrega aquí otros campos necesarios
+            
         }
     } catch (SQLException ex) {
         ex.printStackTrace(System.out);

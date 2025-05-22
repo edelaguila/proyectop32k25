@@ -4,6 +4,7 @@
  */
 package vista;
 
+import Controlador.seguridad.Bitacora;
 import Controlador.seguridad.RelPerfApl;
 import Controlador.seguridad.RelPerfUsu;
 import Controlador.seguridad.UsuarioConectado;
@@ -19,16 +20,17 @@ import vista.ventas_cxc.MantenimientoClientes;
 import vista.ventas_cxc.MantenimientoVendedores;
 
 import vista.ventas_cxc.TransaccionalVentasCC;
-
+import vista.Login;
 /**
  *
  * @author melen
  */
 public class Mdi_VentasCC extends javax.swing.JFrame {
-
+int APLICACION=320;
     /**
      * Creates new form Mdi_VentasCC
      */
+   
     public Mdi_VentasCC() {
         initComponents();
         Seguridad();
@@ -42,7 +44,7 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
    
         
             int idusuarioC = UsuarioConectado.getIdUsuario();
-            
+            jLabel3.setText(UsuarioConectado.getUserName());
             if (idusuarioC != 0) {
                 // Buscar el ID de la aplicación seleccionada
                 for (RelPerfUsu app : productos_ls) {
@@ -51,26 +53,45 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
                         
                         System.out.println("ID perfil del usuario: " + Idperfil); // Opcional: para debug
                        
-                       for (RelPerfApl app2 : ApliUsu) {
-                        if (app2.getPerfil_codigo()==(Idperfil)) {
-                        int Idaplicacion = app2.getAplicacion_codigo();
+                  
+                       
+                    }   
+                    
+                }
+                
+            }//botones
+       
+            if (idusuarioC != 0) {
+                // Buscar el ID de la aplicación seleccionada
+                for (RelPerfUsu app : productos_ls) {
+                    if (app.getUsuario_codigo()==(idusuarioC)) {
+                        int Idperfil = app.getPerfil_codigo();                                                                                                        
+                     for (RelPerfApl app2 : ApliUsu) {
+                        int Idaplicacion = app2.getAplicacion_codigo(); 
+                           if (app2.getPerfil_codigo()==(Idperfil)&&(app2.getAplicacion_codigo()==Idaplicacion)) {
+                      
                         
-                        System.out.println("ID aplicacion del usuario: " + Idaplicacion); // Opcional: para debug
                        
                        switch(Idaplicacion) {
                         case 330:  
                             btnClientes.setEnabled(true);
+                            
                             break;
                         case 340:  
                             btnVendedores.setEnabled(true);
+                            
                             break;
                         case 360:  
                             btnCuentasXc.setEnabled(true);
+                           
                             break;
                         
                         default:
                             System.out.println("ID de aplicación no asociado a ningún botón: " + Idaplicacion);
                     }
+                        
+                         
+                        System.out.println("ID aplicacion " + Idaplicacion+" y el id perfil es "+Idperfil); // Opcional: para debug
                     
                     }
                    }
@@ -78,6 +99,9 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
                     }   
                 }   
             }
+             
+       
+            
     }
     
 
@@ -101,8 +125,13 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         btnCuentasXc = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jLayeredPane1 = new javax.swing.JLayeredPane();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         Label = new javax.swing.JLabel();
+        regresarlogin = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -204,25 +233,41 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
             }
         });
 
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel7.setText("ID Aplicacion");
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(204, 204, 255));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnVendedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCuentasXc, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnVendedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCuentasXc, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(64, 64, 64)
+                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(43, 43, 43)
+                                .addComponent(jLabel7)
+                                .addGap(27, 27, 27)
+                                .addComponent(jLabel6)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(64, 64, 64)
-                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -242,11 +287,15 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
                 .addComponent(btnCuentasXc, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(56, 56, 56)
+                .addGap(22, 22, 22)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel6))
+                .addGap(32, 32, 32)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(90, Short.MAX_VALUE))
+                .addContainerGap(70, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(16, 16, 16)
@@ -254,43 +303,81 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
                     .addContainerGap(527, Short.MAX_VALUE)))
         );
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("jLabel3");
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Usuario Conectado:");
+
+        jLayeredPane1.setLayer(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(jLabel4, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
         jLayeredPane1Layout.setHorizontalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1214, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane1Layout.createSequentialGroup()
+                .addContainerGap(775, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addGap(415, 415, 415))
         );
         jLayeredPane1Layout.setVerticalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 703, Short.MAX_VALUE)
+            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                .addGap(39, 39, 39)
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel3))
+                .addContainerGap(648, Short.MAX_VALUE))
         );
 
+        Label.setForeground(new java.awt.Color(153, 153, 255));
         Label.setIcon(new javax.swing.ImageIcon(System.getProperty("user.dir") + "\\src\\main\\java\\vista\\ventas_cxc\\menuv.jpg"));
         Label.setText("jLabel1");
         Label.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        Label.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        regresarlogin.setBackground(new java.awt.Color(102, 102, 255));
+        regresarlogin.setForeground(new java.awt.Color(255, 255, 255));
+        regresarlogin.setText("↩");
+        regresarlogin.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        regresarlogin.setBorderPainted(false);
+        regresarlogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                regresarloginActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(regresarlogin, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 459, Short.MAX_VALUE)
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(151, Short.MAX_VALUE))
+                .addContainerGap())
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(Label, javax.swing.GroupLayout.DEFAULT_SIZE, 1628, Short.MAX_VALUE))
+                .addComponent(Label, javax.swing.GroupLayout.DEFAULT_SIZE, 2134, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 119, Short.MAX_VALUE)
+                .addComponent(regresarlogin, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(Label, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -305,6 +392,13 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
         Dimension desktopSize = jLayeredPane1.getSize();
         Dimension FrameSize = ventana.getSize();
         ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
+        jLabel6.setText("340");
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Llamado al Mantenimiento Vendedor");   
+       
+       
 
     }//GEN-LAST:event_btnVendedoresActionPerformed
 
@@ -315,7 +409,13 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
         Dimension desktopSize = jLayeredPane1.getSize();
         Dimension FrameSize = ventana.getSize();
         ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
+          jLabel6.setText("330");
 
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Llamado al Mantenimiento Clientes");   
+       
     }//GEN-LAST:event_btnClientesActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -325,6 +425,12 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
        Dimension desktopSize = jLayeredPane1.getSize();
        Dimension FrameSize = ventana.getSize();
        ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
+   
+       UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+       int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Llamado al Mantenimiento Bitacora");    
+   
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -335,6 +441,11 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Gracias por su visita, hasta pronto", "Gracias", JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
         }
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Salio del Sistema");    
+   
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -352,6 +463,11 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Ayuda MDI VentasCC");
+        
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void btnCuentasXcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCuentasXcActionPerformed
@@ -361,8 +477,25 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
         Dimension desktopSize = jLayeredPane1.getSize();
         Dimension FrameSize = ventana.getSize();
         ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
-
+jLabel6.setText("360");
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Llamado al Transaccional VentasXc");    
+   
     }//GEN-LAST:event_btnCuentasXcActionPerformed
+
+    private void regresarloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regresarloginActionPerformed
+    Login login = new Login();
+    login.setVisible(true);
+    this.dispose(); // Cierra la ventana actual (JFramePrincipal)
+    
+    UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+    int resultadoBitacora=0;
+    Bitacora bitacoraRegistro = new Bitacora();
+    resultadoBitacora = bitacoraRegistro.setIngresarBitacora(UsuarioConectado.getIdUsuario(), APLICACION,  "Regresando Al Login");    
+   
+    }//GEN-LAST:event_regresarloginActionPerformed
 
     /**
      * @param args the command line arguments
@@ -410,10 +543,15 @@ public class Mdi_VentasCC extends javax.swing.JFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JButton regresarlogin;
     // End of variables declaration//GEN-END:variables
 }
