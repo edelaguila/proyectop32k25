@@ -18,7 +18,7 @@ public class Clientes {
     String direccion_cliente;
     String telefono_cliente;
     String emaill_cliente;
-    Double limite_credito_CLE;
+    double limite_credito_CLE;
     int dias_credito_CLE;
     String estatus_cliente;
      Double saldo_actual_CLE;

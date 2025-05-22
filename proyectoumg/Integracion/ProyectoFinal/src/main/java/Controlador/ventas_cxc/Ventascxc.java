@@ -8,6 +8,7 @@ package Controlador.ventas_cxc;
  *
  * @author melen
  */
+//Cristian Sipac
 public class Ventascxc {
     int no_factura;
     String no_venta;
@@ -21,7 +22,7 @@ public class Ventascxc {
     String proNombre;
     int dias_credito;
     double total;
-    String precio_producto;
+    String fecha_venta;
 
     public int getNo_factura() {
         return no_factura;
@@ -119,15 +120,17 @@ public class Ventascxc {
         this.total = total;
     }
 
-    public String getPrecio_producto() {
-        return precio_producto;
+    
+
+    public String getFecha_venta() {
+        return fecha_venta;
     }
 
-    public void setPrecio_producto(String precio_producto) {
-        this.precio_producto = precio_producto;
+    public void setFecha_venta(String fecha_venta) {
+        this.fecha_venta = fecha_venta;
     }
 
-    public Ventascxc(int no_factura, String no_venta, int id_vendedor, String nombre_cliente, String apellido_cliente, int pro_codigo, int cantidad, double proPrecios, double saldo_actual, String proNombre, int dias_credito, double total, String precio_producto) {
+    public Ventascxc(int no_factura, String no_venta, int id_vendedor, String nombre_cliente, String apellido_cliente, int pro_codigo, int cantidad, double proPrecios, double saldo_actual, String proNombre, int dias_credito, double total, String precio_producto, String fecha_venta) {
         this.no_factura = no_factura;
         this.no_venta = no_venta;
         this.id_vendedor = id_vendedor;
@@ -140,10 +143,17 @@ public class Ventascxc {
         this.proNombre = proNombre;
         this.dias_credito = dias_credito;
         this.total = total;
-        this.precio_producto = precio_producto;
+        this.fecha_venta = fecha_venta;
     }
 
-    public Ventascxc() {
+    @Override
+    public String toString() {
+        return "Ventascxc{" + "no_factura=" + no_factura + ", no_venta=" + no_venta + ", id_vendedor=" + id_vendedor + ", nombre_cliente=" + nombre_cliente + ", apellido_cliente=" + apellido_cliente + ", pro_codigo=" + pro_codigo + ", cantidad=" + cantidad + ", proPrecios=" + proPrecios + ", saldo_actual=" + saldo_actual + ", proNombre=" + proNombre + ", dias_credito=" + dias_credito + ", total=" + total + ", precio_producto=" + ", fecha_venta=" + fecha_venta + '}';
+    }
+
+    
+
+    public Ventascxc()  {
     }
 
     }

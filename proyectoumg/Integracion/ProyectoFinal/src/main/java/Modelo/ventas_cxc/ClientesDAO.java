@@ -46,7 +46,7 @@ public class ClientesDAO {
                 String direccion_cliente = rs.getString("direccion_cliente");
                 String telefono_cliente = rs.getString("telefono_cliente");
                 String email_cliente = rs.getString("email_cliente");
-                Double limite_creditoCLE = rs.getDouble("limite_credito");
+                double limite_creditoCLE = rs.getDouble("limite_credito");
                 int dias_credito = rs.getInt("dias_credito");
                 String estatus_cliente = rs.getString("estatus_cliente");
                 Double saldo_actual = rs.getDouble("saldo_actual");
@@ -187,7 +187,7 @@ public class ClientesDAO {
                 String direccion_cliente = rs.getString("direccion_cliente");
                 String telefono_cliente = rs.getString("telefono_cliente");
                 String email_cliente = rs.getString("email_cliente");
-                Double limite_creditoCLE = rs.getDouble("limite_credito");
+                double limite_creditoCLE = rs.getDouble("limite_credito");
                 int dias_credito = rs.getInt("dias_credito");
                 String estatus_cliente = rs.getString("estatus_cliente");
                 Double saldo_actual = rs.getDouble("saldo_actual");
