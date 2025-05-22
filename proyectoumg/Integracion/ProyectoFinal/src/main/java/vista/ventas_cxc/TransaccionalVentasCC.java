@@ -997,24 +997,28 @@ lstAplicA.setModel(modelo2);
     }//GEN-LAST:event_btnEliminarUActionPerformed
 private int numG;
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        
+      
 // valida exixtencias antes de generar la venta --- sofi
     int cantidadSolicitada = Integer.parseInt(txtper1.getText());
-    int existenciasActuales = Integer.parseInt(exitxt.getText());
+int existenciasActuales = Integer.parseInt(exitxt.getText());
 
-    if (cantidadSolicitada > existenciasActuales) {
-        JOptionPane.showMessageDialog(null, "Lo siento, venta fallida por falta de productos.\n" +
-                                                "Cantidad disponible: " + existenciasActuales +
-                                                "\nCantidad solicitada: " + cantidadSolicitada);
-        return;
-    }
-       // fin validacion existencias 
-       numG = generaNum();
-    
-        // Opcional: Muestra el número en consola para verificar
-        System.out.println("Número generado: " + numG);
-    
-       generarVenta();
+if (cantidadSolicitada > existenciasActuales) {
+    JOptionPane.showMessageDialog(null, "Lo siento, venta fallida por falta de productos.\n" +
+                                            "Cantidad disponible: " + existenciasActuales +
+                                            "\nCantidad solicitada: " + cantidadSolicitada);
+    return;
+}
+
+// Primero validar crédito llamando a generarVenta() pero sin actualizar existencias aún
+if (!validarCreditoSuficiente()) {  
+    return;     
+}
+
+// Si pasó ambas validaciones, entonces proceder con la actualización de existencias y venta
+numG = generaNum();
+System.out.println("Número generado: " + numG);    
+
+generarVenta();
        
        //nuevo
        VentascxcDAO ventascxcDAO = new VentascxcDAO();
@@ -1025,6 +1029,7 @@ private int numG;
 
     // existencias de productos --- Sofia
    try {
+     
     Connection conn = Conexion.getConnection();
     int cantidadComprada = Integer.parseInt(txtper1.getText());
     int proCodigo = Integer.parseInt(txtproducto.getText());
@@ -1061,9 +1066,7 @@ private int numG;
                 int stockActualizado = rsNuevoStock.getInt("proExistencias");
                 exitxt.setText(String.valueOf(stockActualizado)); // Mostramos el nuevo stock
                 
-                
-                
-                
+               
             }
 
             rsNuevoStock.close();
@@ -1072,10 +1075,9 @@ private int numG;
         } else {
             JOptionPane.showMessageDialog(null, "No se encontró el producto para actualizar.");
         }
-
+     
         psUpdate.close();
     }
-
     rs.close();
     psSelect.close();
     conn.close();
@@ -1103,6 +1105,8 @@ private int numG;
       // Asignar la fecha al objeto
         ventasconfirmar.setFecha_venta(fechaFormateada); 
         
+        
+        
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
@@ -1124,7 +1128,51 @@ private int numG;
      
      
     }//GEN-LAST:event_btnEditarActionPerformed
- private int generaNum() {
+ 
+    private boolean validarCreditoSuficiente() {
+    try {
+        int idCliente = Integer.parseInt(txtper.getText());
+        int cantidad = Integer.parseInt(txtper1.getText());
+        double proPrecio = Double.parseDouble(txtprcioproducto.getText());
+
+        ClientesDAO clientesDAO = new ClientesDAO();
+        Clientes cliente = clientesDAO.getById(idCliente);
+        
+        VentascxcDAO ventasDAO = new VentascxcDAO();
+        Ventascxc ultimaVenta = ventasDAO.UltiVenta(idCliente);
+        
+        double saldoActual = (ultimaVenta != null) ? ultimaVenta.getTotal() : cliente.getSaldo_actual_CLE();
+        double totalVenta = (cantidad * proPrecio) + saldoActual;
+        double limcredito = cliente.getLimite_credito_CLE();
+        
+        if (totalVenta > limcredito) {
+            String mensaje = String.format(
+                "LÍMITE DE CRÉDITO INSUFICIENTE\n\n" +
+                "Cliente: %s %s\n" +
+                "Límite actual: $%,.2f\n" +
+                "Saldo anterior: $%,.2f\n" +
+                "Total venta: $%,.2f\n\n" +
+                "Faltan: $%,.2f para completar la operación",
+                cliente.getNombre_cliente(),
+                cliente.getApellido_cliente(),
+                limcredito,
+                saldoActual,
+                totalVenta,
+                (totalVenta - limcredito)
+            );
+            JOptionPane.showMessageDialog(this, mensaje, "Límite Excedido", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al validar crédito: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+}
+    
+    
+    private int generaNum() {
+     
     int min = 001;  // Valor mínimo
     int max = 100;  // Valor máximo
     return (int) (Math.random() * (max - min + 1) + min);
