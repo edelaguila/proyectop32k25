@@ -54,6 +54,7 @@ public class MdiGeneral extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jDesktopPane1 = new javax.swing.JDesktopPane();
+        regresarSlogin = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         MenuGeneralSeguridad = new javax.swing.JMenu();
         MenuMantenimientos = new javax.swing.JMenu();
@@ -78,15 +79,29 @@ public class MdiGeneral extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
+        regresarSlogin.setText("↩");
+        regresarSlogin.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        regresarSlogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                regresarSloginActionPerformed(evt);
+            }
+        });
+
+        jDesktopPane1.setLayer(regresarSlogin, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 442, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
+                .addGap(0, 399, Short.MAX_VALUE)
+                .addComponent(regresarSlogin, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
+                .addGap(0, 253, Short.MAX_VALUE)
+                .addComponent(regresarSlogin, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         MenuGeneralSeguridad.setText("Seguridad");
@@ -366,6 +381,12 @@ for (javax.swing.JInternalFrame frame : jDesktopPane1.getAllFrames()) {
      ventana.setLocation((desktopSize.width - FrameSize.width) / 2, (desktopSize.height - FrameSize.height) / 2);
     }//GEN-LAST:event_MantenimientoMetododepagoActionPerformed
 
+    private void regresarSloginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regresarSloginActionPerformed
+        Login login = new Login();
+        login.setVisible(true);
+        this.dispose(); // Cierra la ventana actual (JFramePrincipal)
+    }//GEN-LAST:event_regresarSloginActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -423,6 +444,7 @@ for (javax.swing.JInternalFrame frame : jDesktopPane1.getAllFrames()) {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenu mnuAsignaciones;
+    private javax.swing.JButton regresarSlogin;
     private javax.swing.JMenuItem salirSistema;
     // End of variables declaration//GEN-END:variables
 }
