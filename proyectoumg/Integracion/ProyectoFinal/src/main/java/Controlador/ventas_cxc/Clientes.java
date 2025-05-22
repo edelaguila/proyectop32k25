@@ -10,6 +10,7 @@ package Controlador.ventas_cxc;
  *
  * @author visitante
  */
+//Victor 
 public class Clientes {
  
     int id_cliente;
@@ -21,7 +22,7 @@ public class Clientes {
     double limite_credito_CLE;
     int dias_credito_CLE;
     String estatus_cliente;
-     Double saldo_actual_CLE;
+    Double saldo_actual_CLE;
 
     @Override
     public String toString() {

@@ -7,7 +7,7 @@
 
 package Modelo.seguridad;
 
-
+//---------------Victor Omar Gomez Carrascosa 9959-23-10733 -----------------
 import Controlador.seguridad.RelPerfApl;
 import Modelo.Conexion;
 import java.sql.Connection;

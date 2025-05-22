@@ -101,8 +101,6 @@ public productos getById(int idProducto) {
     }
     return producto;
 }
-
-// metodo implementado para manipular variable existencias --- sofia andrade
 public void actualizarExistencias(int proCodigo, int cantidadVendida) {
     Connection conn = null;
     PreparedStatement stmt = null;
@@ -120,8 +118,10 @@ public void actualizarExistencias(int proCodigo, int cantidadVendida) {
         Conexion.close(stmt);
         Conexion.close(conn);
     }
-    // fin de metodo implementado para manipular variable existencias
+}
 
-  }
+
+
+
 }
         

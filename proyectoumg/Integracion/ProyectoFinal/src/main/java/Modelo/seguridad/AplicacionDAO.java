@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package Modelo.seguridad;
-
+//---------------Victor Omar Gomez Carrascosa 9959-23-10733-----------------------------------------
 import Controlador.seguridad.Aplicacion;
 import Modelo.Conexion;
 import java.sql.Connection;

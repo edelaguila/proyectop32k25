@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-05-2025 a las 19:31:56
+-- Tiempo de generación: 22-05-2025 a las 16:58:01
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -40,28 +40,17 @@ CREATE TABLE `transaccionalvxc` (
   `proNombre` varchar(60) DEFAULT NULL,
   `dias_credito` int(11) DEFAULT NULL,
   `total` decimal(12,2) DEFAULT NULL,
-  `precio_producto` varchar(5) DEFAULT NULL
+  `fecha_venta` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Volcado de datos para la tabla `transaccionalvxc`
 --
 
-INSERT INTO `transaccionalvxc` (`no_factura`, `no_venta`, `id_vendedor`, `nombre_cliente`, `apellido_cliente`, `proCodigo`, `cantidad`, `proPrecios`, `saldo_actual`, `proNombre`, `dias_credito`, `total`, `precio_producto`) VALUES
-(3, '27', 3, 'Vicoromar', 'gomez', 10, 2, 106.00, 2500.00, 'ElPepe', 10, 2712.00, NULL),
-(3, '46', 3, 'Vicoromar', 'gomez', 20, 2, 200.00, 2500.00, 'Disco Duro', 10, 2900.00, NULL),
-(13, '328', 1, 'Vicoromar', 'gomez', 10, 2, 106.00, 2500.00, 'ElPepe', 10, 2712.00, NULL),
-(14, '328', 1, 'Vicoromar', 'gomez', 20, 2, 200.00, 2500.00, 'Disco Duro', 10, 2900.00, NULL),
-(15, '', 1, 'Vicoromar', 'gomez', 20, 3, 200.00, 2500.00, 'Disco Duro', 10, 3100.00, NULL),
-(16, '081', 3, 'Carlos', 'Calderon', 20, 2, 200.00, 20.00, 'Disco Duro', 20, 420.00, NULL),
-(17, '081', 3, 'Carlos', 'Calderon', 10, 2, 106.00, 20.00, 'ElPepe', 20, 232.00, NULL),
-(18, '', 3, 'Vicoromar', 'gomez', 20, 1, 200.00, 2500.00, 'Disco Duro', 10, 2700.00, NULL),
-(19, '578', 3, 'Vicoromar', 'gomez', 20, 3, 200.00, 2500.00, 'Disco Duro', 10, 3100.00, NULL),
-(20, '578', 3, 'Vicoromar', 'gomez', 10, 3, 106.00, 2500.00, 'ElPepe', 10, 2818.00, NULL),
-(21, '598', 3, 'Carlos', 'Calderon', 10, 3, 106.00, 20.00, 'ElPepe', 20, 338.00, NULL),
-(22, '320', 3, 'Vicoromar', 'gomez', 20, 6, 200.00, 2500.00, 'Disco Duro', 10, 3700.00, NULL),
-(23, '13', 3, 'Carlos', 'Calderon', 10, 10, 106.00, 20.00, 'ElPepe', 20, 1080.00, NULL),
-(24, '95', 3, 'Carlos', 'Calderon', 20, 2, 200.00, 20.00, 'Disco Duro', 20, 420.00, NULL);
+INSERT INTO `transaccionalvxc` (`no_factura`, `no_venta`, `id_vendedor`, `nombre_cliente`, `apellido_cliente`, `proCodigo`, `cantidad`, `proPrecios`, `saldo_actual`, `proNombre`, `dias_credito`, `total`, `fecha_venta`) VALUES
+(6, '93', 3, 'Mailo', 'Melendez', 3034, 1, 10.00, 200.00, 'UNIDAD MANGO', 12, 210.00, '2025-05-22 08:48:38'),
+(8, '99', 3, 'Cristian', 'Sipac', 2026, 1, 500.00, 250.00, ' PUYASO RES IMPORTADO EMPACADO', 12, 750.00, '2025-05-22 08:49:00'),
+(14, '88', 3, 'Pingu', 'Calderon', 3032, 2, 20.00, 0.00, 'LIBRA DE FRESAS', 7, 40.00, '2025-05-22 08:50:44');
 
 --
 -- Índices para tablas volcadas

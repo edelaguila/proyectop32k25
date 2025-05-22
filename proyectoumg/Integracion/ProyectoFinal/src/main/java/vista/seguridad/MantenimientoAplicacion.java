@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package vista.seguridad;
-
+//---------Cristian David Sipac Ispache 9959-23-1567---------------------
 //import datos.EmpleadoDAO;
 import Modelo.seguridad.AplicacionDAO;
 //import domain.Empleado;

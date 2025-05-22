@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Controlador.seguridad;
-
+//----------------Evelyn Sofia Andrade Luna 9959-23-1224-------------------------
 /**
  *
  * @author cdavi

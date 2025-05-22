@@ -240,9 +240,10 @@ public class ClientesDAO {
             cliente.setId_cliente(rs.getInt("id_cliente"));
             cliente.setNombre_cliente(rs.getString("nombre_cliente"));
             cliente.setApellido_cliente(rs.getString("apellido_cliente"));
-            cliente.setDias_credito_CLE(rs.getInt("dias_credito")); // Asegúrate que este campo existe
+            cliente.setLimite_credito_CLE(rs.getDouble("limite_credito"));
+            cliente.setDias_credito_CLE(rs.getInt("dias_credito"));// Asegúrate que este campo existe
             cliente.setSaldo_actual_CLE(rs.getDouble("saldo_actual")); // Asegúrate que este campo existe
-            // Agrega aquí otros campos necesarios
+            
         }
     } catch (SQLException ex) {
         ex.printStackTrace(System.out);

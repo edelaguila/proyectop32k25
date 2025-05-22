@@ -5,7 +5,7 @@
  */
 package vista.seguridad;
 
-
+// Transaccional elaborado por: Carlos Calderon, Victor Gomez e Isabel Melendez
 import Controlador.seguridad.RelPerfApl;
 import Modelo.seguridad.RelPerfAplDAO;
 import Modelo.seguridad.AplicacionDAO;
