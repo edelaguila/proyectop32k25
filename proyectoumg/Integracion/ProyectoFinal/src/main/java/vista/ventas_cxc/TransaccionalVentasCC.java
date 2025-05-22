@@ -505,7 +505,6 @@ lstAplicA.setModel(modelo);
         transaccional_VCXC = new javax.swing.JTable();
         label18 = new javax.swing.JLabel();
         fechav = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         exitxt = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -735,9 +734,6 @@ lstAplicA.setModel(modelo);
         fechav.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         fechav.setEnabled(false);
         getContentPane().add(fechav, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 400, 160, 30));
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vendedor.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 10, -1, 400));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Existencias: ");
@@ -1092,7 +1088,6 @@ private int numG;
     private javax.swing.JTextField fechav;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
