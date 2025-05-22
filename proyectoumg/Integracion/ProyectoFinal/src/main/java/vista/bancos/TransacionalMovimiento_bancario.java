@@ -253,7 +253,7 @@ private permisos permisosUsuarioActual;
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Movimineto bancario");
+        setTitle("110");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

@@ -183,7 +183,7 @@ private permisos permisosUsuarioActual;
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoTasa_de_cambio_diario");
+        setTitle("107");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

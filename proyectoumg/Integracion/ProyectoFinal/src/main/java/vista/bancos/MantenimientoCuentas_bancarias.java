@@ -163,7 +163,7 @@ public class MantenimientoCuentas_bancarias extends javax.swing.JInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoCuentas_bancarias");
+        setTitle("109");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

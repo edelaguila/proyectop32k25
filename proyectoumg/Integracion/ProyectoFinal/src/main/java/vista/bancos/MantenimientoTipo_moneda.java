@@ -150,7 +150,7 @@ private permisos permisosUsuarioActual;
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoTipo_Moneda");
+        setTitle("108");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

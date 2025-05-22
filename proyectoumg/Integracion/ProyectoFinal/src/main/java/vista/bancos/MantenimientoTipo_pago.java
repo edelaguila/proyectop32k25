@@ -125,7 +125,7 @@ public class MantenimientoTipo_pago extends javax.swing.JInternalFrame { // Clas
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoTipo_Pago");
+        setTitle("106");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

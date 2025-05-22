@@ -238,7 +238,7 @@ public class TransacionalConciliacion_bancaria extends javax.swing.JInternalFram
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Conciliacion Bancaria");
+        setTitle("112");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

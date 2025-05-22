@@ -124,7 +124,7 @@ public class MantenimientoTipo_operacion_bancaria extends javax.swing.JInternalF
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoTipo_operacion_bancaria");
+        setTitle("105");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

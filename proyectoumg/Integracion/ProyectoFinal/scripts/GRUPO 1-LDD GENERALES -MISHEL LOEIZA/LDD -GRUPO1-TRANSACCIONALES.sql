@@ -25,16 +25,19 @@ CREATE TABLE `detalle_movimientos_bancarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 
-CREATE TABLE `conciliacion_bancaria` (
-  `id_conciliacion` int(11) NOT NULL,
-  `id_cuenta` int(11) NOT NULL,
-  `id_movimiento_bancario` int(11) NOT NULL,
-  `fecha` date NOT NULL DEFAULT curdate(),
-  `saldo` decimal(15,2) NOT NULL DEFAULT 0.00,
-  `saldo_actualizado` decimal(10,2) NOT NULL,
-  `status` varchar(20) DEFAULT NULL COMMENT 'CONCILIADO o PENDIENTE'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
+CREATE TABLE conciliacion_bancaria (
+    id_conciliacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_cuenta INT NOT NULL,
+    id_movimiento_bancario INT NOT NULL,
+    fecha DATETIME NOT NULL,
+    saldo DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    saldo_actualizado decimal(10,2) NOT NULL,
+    status VARCHAR(20) DEFAULT NULL COMMENT 'CONCILIADO o PENDIENTE',
+    FOREIGN KEY (id_cuenta) REFERENCES cuentas_bancarias(id_cuenta) ON DELETE CASCADE,
+    FOREIGN KEY (id_movimiento_bancario) REFERENCES movimientos_bancarios(id_movimiento_bancario) ON DELETE CASCADE,
+    INDEX (id_cuenta),
+    INDEX (id_movimiento_bancario)
+);
 
 ALTER TABLE `cuentas_bancarias`
   ADD PRIMARY KEY (`id_cuenta`),

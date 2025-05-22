@@ -155,7 +155,7 @@ public class MantenimientoDetalle_movimientos_bancarios extends javax.swing.JInt
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoDetalle_movimientos_bancarios");
+        setTitle("111");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

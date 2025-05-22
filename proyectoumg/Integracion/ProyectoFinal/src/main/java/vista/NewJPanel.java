@@ -4,47 +4,72 @@ import java.sql.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.Vector;
+
 //PERMISOS GLOBALES
 public class NewJPanel extends javax.swing.JPanel {
 
     public NewJPanel() {
         initComponents();
     }
+//CONEXIÒN A LA BASE DE DATOS
     private void buscarPermisosPorId(int id) {
-    String JDBC_URL = "jdbc:mysql://localhost/sig2k25?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    String usuario = "MISHEL";
-    String password = "311";
+        String JDBC_URL = "jdbc:mysql://localhost/sig2k25?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+        String usuario = "MISHEL";
+        String password = "311";
 
-    try (Connection cn = DriverManager.getConnection(JDBC_URL, usuario, password);
-         PreparedStatement pst = cn.prepareStatement("SELECT * FROM permisos_usuario WHERE id_usuario = ?")) {
+        try (Connection cn = DriverManager.getConnection(JDBC_URL, usuario, password);
+             PreparedStatement pst = cn.prepareStatement("SELECT * FROM permisos_usuario WHERE id_usuario = ?")) {
 
-        pst.setInt(1, id);
-        ResultSet rs = pst.executeQuery();
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+//PERMISOS
+            if (rs.next()) {
+                // Marcar los checkboxes según los permisos en la base de datos
+                txtPermisoMantenimiento.setSelected(rs.getInt("puede_mantenimiento") == 1);
+                txtPermisoProcesos.setSelected(rs.getInt("puede_procesos") == 1);
+                txtPermisoEliminar.setSelected(rs.getInt("puede_eliminar") == 1);
+                txtPermisoRegistrar.setSelected(rs.getInt("puede_registrar") == 1);
+                txtPermisoModificar.setSelected(rs.getInt("puede_modificar") == 1);
 
-        if (rs.next()) {
-            // Marcar los checkboxes según los permisos en la base de datos
-            txtPermisoMantenimiento.setSelected(rs.getInt("puede_mantenimiento") == 1);
-            txtPermisoProcesos.setSelected(rs.getInt("puede_procesos") == 1);
-            txtPermisoEliminar.setSelected(rs.getInt("puede_eliminar") == 1);
-            txtPermisoRegistrar.setSelected(rs.getInt("puede_registrar") == 1);
-            txtPermisoModificar.setSelected(rs.getInt("puede_modificar") == 1);
-        } else {
-            JOptionPane.showMessageDialog(this, "No se encontró usuario con ID: " + id);
-            // Limpiar checkboxes si no encuentra usuario
-            txtPermisoMantenimiento.setSelected(false);
-            txtPermisoProcesos.setSelected(false);
-            txtPermisoEliminar.setSelected(false);
-            txtPermisoRegistrar.setSelected(false);
-            txtPermisoModificar.setSelected(false);
+                // Ahora también manejar los permisos de aplicaciones APL103 - APL112
+                txtAPL103.setSelected(rs.getInt("APL103") == 1);
+                txtAPL104.setSelected(rs.getInt("APL104") == 1);
+                txtAPL105.setSelected(rs.getInt("APL105") == 1);
+                txtAPL106.setSelected(rs.getInt("APL106") == 1);
+                txtAPL107.setSelected(rs.getInt("APL107") == 1);
+                txtAPL108.setSelected(rs.getInt("APL108") == 1);
+                txtAPL109.setSelected(rs.getInt("APL109") == 1);
+                txtAPL110.setSelected(rs.getInt("APL110") == 1);
+                txtAPL111.setSelected(rs.getInt("APL111") == 1);
+                txtAPL112.setSelected(rs.getInt("APL112") == 1);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró usuario con ID: " + id);
+                limpiarCheckBoxes();
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al buscar permisos: " + e.getMessage());
         }
-
-        rs.close();
-
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al buscar permisos: " + e.getMessage());
     }
-}
 
+    private void limpiarCheckBoxes() {
+        txtPermisoMantenimiento.setSelected(false);
+        txtPermisoProcesos.setSelected(false);
+        txtPermisoEliminar.setSelected(false);
+        txtPermisoRegistrar.setSelected(false);
+        txtPermisoModificar.setSelected(false);
+
+        // Limpiar permisos de aplicaciones también
+        txtAPL103.setSelected(false);
+        txtAPL104.setSelected(false);
+        txtAPL105.setSelected(false);
+        txtAPL106.setSelected(false);
+        txtAPL107.setSelected(false);
+        txtAPL108.setSelected(false);
+        txtAPL109.setSelected(false);
+        txtAPL110.setSelected(false);
+        txtAPL111.setSelected(false);
+        txtAPL112.setSelected(false);
+    }
 
     public static DefaultTableModel buildTableModel(ResultSet rs) throws SQLException {
         ResultSetMetaData metaDatos = rs.getMetaData();
@@ -90,7 +115,6 @@ public class NewJPanel extends javax.swing.JPanel {
         return modelo;
     }
 
-
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -114,6 +138,19 @@ public class NewJPanel extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jButton6 = new javax.swing.JButton();
+        txtAPL104 = new javax.swing.JCheckBox();
+        txtAPL103 = new javax.swing.JCheckBox();
+        txtAPL106 = new javax.swing.JCheckBox();
+        txtAPL107 = new javax.swing.JCheckBox();
+        txtAPL108 = new javax.swing.JCheckBox();
+        txtAPL105 = new javax.swing.JCheckBox();
+        txtAPL110 = new javax.swing.JCheckBox();
+        txtAPL109 = new javax.swing.JCheckBox();
+        txtAPL111 = new javax.swing.JCheckBox();
+        txtAPL112 = new javax.swing.JCheckBox();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -230,51 +267,113 @@ public class NewJPanel extends javax.swing.JPanel {
             }
         });
 
+        txtAPL104.setText("104");
+
+        txtAPL103.setText("103");
+
+        txtAPL106.setText("106");
+
+        txtAPL107.setText("107");
+
+        txtAPL108.setText("108");
+
+        txtAPL105.setText("105");
+
+        txtAPL110.setText("110");
+
+        txtAPL109.setText("109");
+
+        txtAPL111.setText("111");
+
+        txtAPL112.setText("112");
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel7.setText("MODULOS");
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel8.setText("FUNCIONES");
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel9.setText("APLICACIONES");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(32, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 688, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtPermisoModificar)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 855, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(17, 17, 17)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)))
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtId)
-                            .addComponent(txtPermisoMantenimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtPermisoEliminar, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPermisoProcesos)
-                            .addComponent(txtPermisoRegistrar)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel1)
+                                .addComponent(jLabel6)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel4)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addComponent(txtAPL103)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtAPL107)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtAPL111))
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(txtAPL104)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtAPL108)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtAPL112))
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(txtAPL105)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(txtAPL109)))
+                                    .addGap(39, 39, 39)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGap(6, 6, 6))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(txtAPL106)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtAPL110)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(24, 24, 24))
+                                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtPermisoMantenimiento)
+                                    .addComponent(txtPermisoProcesos)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(21, 21, 21)
+                                        .addComponent(jLabel9)))
+                                .addGap(82, 82, 82)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtPermisoRegistrar)
+                                    .addComponent(txtPermisoEliminar)
+                                    .addComponent(txtPermisoModificar))))
+                        .addContainerGap(12, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel8)
+                        .addGap(80, 80, 80))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
                         .addGap(2, 2, 2)
@@ -286,31 +385,56 @@ public class NewJPanel extends javax.swing.JPanel {
                             .addComponent(jButton6))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtPermisoMantenimiento)
-                            .addComponent(txtPermisoProcesos))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(txtPermisoEliminar))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtPermisoEliminar)
+                            .addComponent(txtPermisoProcesos)
                             .addComponent(txtPermisoRegistrar))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtPermisoModificar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton3)
-                            .addComponent(jButton4))
-                        .addGap(12, 12, 12)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtAPL103)
+                                    .addComponent(txtAPL107)
+                                    .addComponent(txtAPL111))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtAPL104)
+                                    .addComponent(txtAPL108)
+                                    .addComponent(txtAPL112))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtAPL105)
+                                    .addComponent(txtAPL109))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtAPL106)
+                                    .addComponent(txtAPL110)
+                                    .addComponent(jButton2)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(txtPermisoModificar)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton4)))
+                        .addGap(18, 18, 18)
                         .addComponent(jLabel4)
-                        .addGap(4, 4, 4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel5)))
+                .addGap(5, 5, 5)
+                .addComponent(jLabel6)
                 .addContainerGap(22, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -324,81 +448,141 @@ public class NewJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
- try {
-            int id = Integer.parseInt(txtId.getText());
-            int pm = txtPermisoMantenimiento.isSelected() ? 1 : 0;
-            int pp = txtPermisoProcesos.isSelected() ? 1 : 0;
-            int pe = txtPermisoEliminar.isSelected() ? 1 : 0;
-            int pr = txtPermisoRegistrar.isSelected() ? 1 : 0;
-            int pmf = txtPermisoModificar.isSelected() ? 1 : 0;
+                                       
+    try {
+        int id = Integer.parseInt(txtId.getText());
+        
+        // Captura permisos de usuario
+        int pm = txtPermisoMantenimiento.isSelected() ? 1 : 0;
+        int pp = txtPermisoProcesos.isSelected() ? 1 : 0;
+        int pe = txtPermisoEliminar.isSelected() ? 1 : 0;
+        int pr = txtPermisoRegistrar.isSelected() ? 1 : 0;
+        int pmf = txtPermisoModificar.isSelected() ? 1 : 0;
 
-            String JDBC_URL = "jdbc:mysql://localhost/sig2k25?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String usuario = "MISHEL";
-            String password = "311";
+        // Captura permisos de aplicaciones APL103 - APL112
+        int apl103 = txtAPL103.isSelected() ? 1 : 0;
+        int apl104 = txtAPL104.isSelected() ? 1 : 0;
+        int apl105 = txtAPL105.isSelected() ? 1 : 0;
+        int apl106 = txtAPL106.isSelected() ? 1 : 0;
+        int apl107 = txtAPL107.isSelected() ? 1 : 0;
+        int apl108 = txtAPL108.isSelected() ? 1 : 0;
+        int apl109 = txtAPL109.isSelected() ? 1 : 0;
+        int apl110 = txtAPL110.isSelected() ? 1 : 0;
+        int apl111 = txtAPL111.isSelected() ? 1 : 0;
+        int apl112 = txtAPL112.isSelected() ? 1 : 0;
 
-            try (Connection cn = DriverManager.getConnection(JDBC_URL, usuario, password);
-                 PreparedStatement pst = cn.prepareStatement("UPDATE permisos_usuario SET puede_mantenimiento=?, puede_procesos=?, puede_eliminar=?, puede_registrar=?, puede_modificar=? WHERE id_usuario=?")) {
+        String JDBC_URL = "jdbc:mysql://localhost/sig2k25?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+        String usuario = "MISHEL";
+        String password = "311";
 
-                pst.setInt(1, pm);
-                pst.setInt(2, pp);
-                pst.setInt(3, pe);
-                pst.setInt(4, pr);
-                pst.setInt(5, pmf);
-                pst.setInt(6, id);
+        try (Connection cn = DriverManager.getConnection(JDBC_URL, usuario, password);
+             PreparedStatement pst = cn.prepareStatement("UPDATE permisos_usuario SET puede_mantenimiento=?, puede_procesos=?, puede_eliminar=?, puede_registrar=?, puede_modificar=?, "
+                                                          + "APL103=?, APL104=?, APL105=?, APL106=?, APL107=?, APL108=?, APL109=?, APL110=?, APL111=?, APL112=? WHERE id_usuario=?")) {
 
-                int filasAfectadas = pst.executeUpdate();
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "Permisos actualizados correctamente.");
-                    TABLAB.setModel(cargarPermisosUsuarioDesdeBD());
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró el usuario con ese ID.");
-                }
+            // Asignación de permisos de usuario
+            pst.setInt(1, pm);
+            pst.setInt(2, pp);
+            pst.setInt(3, pe);
+            pst.setInt(4, pr);
+            pst.setInt(5, pmf);
+
+            // Asignación de permisos de aplicaciones
+            pst.setInt(6, apl103);
+            pst.setInt(7, apl104);
+            pst.setInt(8, apl105);
+            pst.setInt(9, apl106);
+            pst.setInt(10, apl107);
+            pst.setInt(11, apl108);
+            pst.setInt(12, apl109);
+            pst.setInt(13, apl110);
+            pst.setInt(14, apl111);
+            pst.setInt(15, apl112);
+
+            // Asigna el ID del usuario
+            pst.setInt(16, id);
+
+            int filasAfectadas = pst.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(this, "Permisos actualizados correctamente.");
+                TABLAB.setModel(cargarPermisosUsuarioDesdeBD());
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró el usuario con ese ID.");
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al actualizar permisos: " + e.getMessage());
         }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al actualizar permisos: " + e.getMessage());
+    }
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:                                         
-        try {
-            int id = Integer.parseInt(txtId.getText());
-            int pm = txtPermisoMantenimiento.isSelected() ? 1 : 0;
-            int pp = txtPermisoProcesos.isSelected() ? 1 : 0;
-            int pe = txtPermisoEliminar.isSelected() ? 1 : 0;
-            int pr = txtPermisoRegistrar.isSelected() ? 1 : 0;
-            int pmf = txtPermisoModificar.isSelected() ? 1 : 0;
+                                         
+    try {
+        int id = Integer.parseInt(txtId.getText());
 
-            String JDBC_URL = "jdbc:mysql://localhost/sig2k25?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-            String usuario = "MISHEL";
-            String password = "311";
+        // Captura permisos de usuario
+        int pm = txtPermisoMantenimiento.isSelected() ? 1 : 0;
+        int pp = txtPermisoProcesos.isSelected() ? 1 : 0;
+        int pe = txtPermisoEliminar.isSelected() ? 1 : 0;
+        int pr = txtPermisoRegistrar.isSelected() ? 1 : 0;
+        int pmf = txtPermisoModificar.isSelected() ? 1 : 0;
 
-            try (Connection cn = DriverManager.getConnection(JDBC_URL, usuario, password);
-                 PreparedStatement pst = cn.prepareStatement("INSERT INTO permisos_usuario (id_usuario, puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar) VALUES (?, ?, ?, ?, ?, ?)")) {
+        // Captura permisos de aplicaciones APL103 - APL112
+        int apl103 = txtAPL103.isSelected() ? 1 : 0;
+        int apl104 = txtAPL104.isSelected() ? 1 : 0;
+        int apl105 = txtAPL105.isSelected() ? 1 : 0;
+        int apl106 = txtAPL106.isSelected() ? 1 : 0;
+        int apl107 = txtAPL107.isSelected() ? 1 : 0;
+        int apl108 = txtAPL108.isSelected() ? 1 : 0;
+        int apl109 = txtAPL109.isSelected() ? 1 : 0;
+        int apl110 = txtAPL110.isSelected() ? 1 : 0;
+        int apl111 = txtAPL111.isSelected() ? 1 : 0;
+        int apl112 = txtAPL112.isSelected() ? 1 : 0;
 
-                pst.setInt(1, id);
-                pst.setInt(2, pm);
-                pst.setInt(3, pp);
-                pst.setInt(4, pe);
-                pst.setInt(5, pr);
-                pst.setInt(6, pmf);
+        String JDBC_URL = "jdbc:mysql://localhost/sig2k25?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+        String usuario = "MISHEL";
+        String password = "311";
 
-                int filasAfectadas = pst.executeUpdate();
-                if (filasAfectadas > 0) {
-                    JOptionPane.showMessageDialog(this, "Permisos agregados correctamente.");
-                    TABLAB.setModel(cargarPermisosUsuarioDesdeBD());
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se pudo agregar los permisos.");
-                }
+        try (Connection cn = DriverManager.getConnection(JDBC_URL, usuario, password);
+             PreparedStatement pst = cn.prepareStatement("INSERT INTO permisos_usuario (id_usuario, puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar, "
+                                                          + "APL103, APL104, APL105, APL106, APL107, APL108, APL109, APL110, APL111, APL112) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+
+            // Asignación de permisos de usuario
+            pst.setInt(1, id);
+            pst.setInt(2, pm);
+            pst.setInt(3, pp);
+            pst.setInt(4, pe);
+            pst.setInt(5, pr);
+            pst.setInt(6, pmf);
+
+            // Asignación de permisos de aplicaciones
+            pst.setInt(7, apl103);
+            pst.setInt(8, apl104);
+            pst.setInt(9, apl105);
+            pst.setInt(10, apl106);
+            pst.setInt(11, apl107);
+            pst.setInt(12, apl108);
+            pst.setInt(13, apl109);
+            pst.setInt(14, apl110);
+            pst.setInt(15, apl111);
+            pst.setInt(16, apl112);
+
+            int filasAfectadas = pst.executeUpdate();
+            if (filasAfectadas > 0) {
+                JOptionPane.showMessageDialog(this, "Permisos agregados correctamente.");
+                TABLAB.setModel(cargarPermisosUsuarioDesdeBD());
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo agregar los permisos.");
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al agregar permisos: " + e.getMessage());
         }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al agregar permisos: " + e.getMessage());
+    }
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-                                                
+                                        
     try {
         int id = Integer.parseInt(txtId.getText());
 
@@ -426,10 +610,16 @@ public class NewJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-
+                                        
     try {
-        int id = Integer.parseInt(txtId.getText().trim());
+        String idText = txtId.getText().trim();
+        
+        if (idText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese un ID antes de buscar.");
+            return;
+        }
+
+        int id = Integer.parseInt(idText);
         buscarPermisosPorId(id);
     } catch (NumberFormatException e) {
         JOptionPane.showMessageDialog(this, "Ingrese un ID válido.");
@@ -438,16 +628,29 @@ public class NewJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-         // Limpia el campo de ID
+                                        
+    // Limpia el campo de ID
     txtId.setText("");
 
-    // Desmarca todos los checkboxes
+    // Desmarca todos los checkboxes de permisos generales
     txtPermisoMantenimiento.setSelected(false);
     txtPermisoProcesos.setSelected(false);
     txtPermisoEliminar.setSelected(false);
     txtPermisoRegistrar.setSelected(false);
     txtPermisoModificar.setSelected(false);
+
+    // Desmarca también los permisos de aplicaciones APL103 - APL112
+    txtAPL103.setSelected(false);
+    txtAPL104.setSelected(false);
+    txtAPL105.setSelected(false);
+    txtAPL106.setSelected(false);
+    txtAPL107.setSelected(false);
+    txtAPL108.setSelected(false);
+    txtAPL109.setSelected(false);
+    txtAPL110.setSelected(false);
+    txtAPL111.setSelected(false);
+    txtAPL112.setSelected(false);
+
     }//GEN-LAST:event_jButton6ActionPerformed
 
 
@@ -465,7 +668,20 @@ public class NewJPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JCheckBox txtAPL103;
+    private javax.swing.JCheckBox txtAPL104;
+    private javax.swing.JCheckBox txtAPL105;
+    private javax.swing.JCheckBox txtAPL106;
+    private javax.swing.JCheckBox txtAPL107;
+    private javax.swing.JCheckBox txtAPL108;
+    private javax.swing.JCheckBox txtAPL109;
+    private javax.swing.JCheckBox txtAPL110;
+    private javax.swing.JCheckBox txtAPL111;
+    private javax.swing.JCheckBox txtAPL112;
     private javax.swing.JTextField txtId;
     private javax.swing.JCheckBox txtPermisoEliminar;
     private javax.swing.JCheckBox txtPermisoMantenimiento;

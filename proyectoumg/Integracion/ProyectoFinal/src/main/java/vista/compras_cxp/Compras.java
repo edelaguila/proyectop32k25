@@ -87,7 +87,7 @@ public class Compras extends javax.swing.JInternalFrame {
             }
         }
     }
-});
+        });
     
     
     

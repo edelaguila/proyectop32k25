@@ -145,7 +145,7 @@ private permisos permisosUsuarioActual;
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Mantenimiento Bancos");
+        setTitle("103");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");

@@ -1,12 +1,15 @@
 package Controlador.seguridad;
 
 public class permisos {
-    private int idUsuario; // <- agregar este atributo
+    private int idUsuario; 
     private boolean puedeMantenimiento;
     private boolean puedeProcesos;
     private boolean puedeEliminar;
     private boolean puedeRegistrar;
     private boolean puedeModificar;
+    
+    // Array para manejar permisos de aplicaciones dinámicamente
+    private boolean[] permisosAplicaciones = new boolean[10]; // APL103 - APL112
 
     // Getters y setters para idUsuario
     public int getIdUsuario() {
@@ -17,7 +20,7 @@ public class permisos {
         this.idUsuario = idUsuario;
     }
 
-    // Getters y setters para los permisos
+    // Getters y setters para los permisos generales
     public boolean isPuedeMantenimiento() {
         return puedeMantenimiento;
     }
@@ -56,5 +59,19 @@ public class permisos {
 
     public void setPuedeModificar(boolean puedeModificar) {
         this.puedeModificar = puedeModificar;
+    }
+
+    // Métodos dinámicos para permisos de aplicaciones APL103 - APL112
+    public boolean getPermisoAplicacion(int numero) {
+        if (numero >= 103 && numero <= 112) {
+            return permisosAplicaciones[numero - 103];
+        }
+        return false;
+    }
+
+    public void setPermisoAplicacion(int numero, boolean valor) {
+        if (numero >= 103 && numero <= 112) {
+            permisosAplicaciones[numero - 103] = valor;
+        }
     }
 }

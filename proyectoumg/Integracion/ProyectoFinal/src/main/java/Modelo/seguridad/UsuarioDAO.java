@@ -187,16 +187,17 @@ public class UsuarioDAO {
 
         return usuario;
     }
-
+//METODOS PARA PERMISOS A NIVEL DE SEGURIDAD MISHEL LOEIZA 9959-23-3457
  public permisos obtenerPermisosPorUsuario(int idUsuario) {
     permisos permisos = new permisos();
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
-
+//CONEXIÒN A PERMISOS
     try {
         conn = Conexion.getConnection();
-        String sql = "SELECT puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar " +
+        String sql = "SELECT puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar, " +
+                     "APL103, APL104, APL105, APL106, APL107, APL108, APL109, APL110, APL111, APL112 " +
                      "FROM permisos_usuario WHERE id_usuario = ?";
         ps = conn.prepareStatement(sql);
         ps.setInt(1, idUsuario);
@@ -209,6 +210,11 @@ public class UsuarioDAO {
             permisos.setPuedeRegistrar(rs.getBoolean("puede_registrar"));
             permisos.setPuedeModificar(rs.getBoolean("puede_modificar"));
             permisos.setIdUsuario(idUsuario);
+
+            // Asignar permisos de aplicaciones
+            for (int i = 103; i <= 112; i++) {
+                permisos.setPermisoAplicacion(i, rs.getBoolean("APL" + i));
+            }
         }
 
     } catch (SQLException e) {
@@ -220,8 +226,7 @@ public class UsuarioDAO {
     }
     return permisos;
 }
-
-
+//IMPLEMENTACION DE ELIMINAR A BASE DIRECTAR EN SQL
 public boolean eliminarPermisos(int idUsuario) {
     Connection conn = null;
     PreparedStatement ps = null;
@@ -240,22 +245,32 @@ public boolean eliminarPermisos(int idUsuario) {
         Conexion.close(conn);
     }
 }
-
+//ACTUALIZACIÒN AUTOMATICA
 public boolean actualizarPermisos(int idUsuario, boolean puedeMantenimiento, boolean puedeProcesos,
-                                  boolean puedeEliminar, boolean puedeRegistrar, boolean puedeModificar) {
+                                  boolean puedeEliminar, boolean puedeRegistrar, boolean puedeModificar,
+                                  boolean[] permisosAplicaciones) {
     Connection conn = null;
     PreparedStatement ps = null;
     try {
         conn = Conexion.getConnection();
         String sql = "UPDATE permisos_usuario SET puede_mantenimiento = ?, puede_procesos = ?, " +
-                     "puede_eliminar = ?, puede_registrar = ?, puede_modificar = ? WHERE id_usuario = ?";
+                     "puede_eliminar = ?, puede_registrar = ?, puede_modificar = ?, " +
+                     "APL103 = ?, APL104 = ?, APL105 = ?, APL106 = ?, APL107 = ?, " +
+                     "APL108 = ?, APL109 = ?, APL110 = ?, APL111 = ?, APL112 = ? " +
+                     "WHERE id_usuario = ?";
         ps = conn.prepareStatement(sql);
         ps.setBoolean(1, puedeMantenimiento);
         ps.setBoolean(2, puedeProcesos);
         ps.setBoolean(3, puedeEliminar);
         ps.setBoolean(4, puedeRegistrar);
         ps.setBoolean(5, puedeModificar);
-        ps.setInt(6, idUsuario);
+
+        // Asignación de permisos de aplicaciones
+        for (int i = 103; i <= 112; i++) {
+            ps.setBoolean(i - 97, permisosAplicaciones[i - 103]);
+        }
+
+        ps.setInt(16, idUsuario);
 
         int rows = ps.executeUpdate();
         return rows > 0;
@@ -268,14 +283,17 @@ public boolean actualizarPermisos(int idUsuario, boolean puedeMantenimiento, boo
     }
 }
 
-public boolean insertarpermisos(int idUsuario, boolean puedeMantenimiento, boolean puedeProcesos,
-                               boolean puedeEliminar, boolean puedeRegistrar, boolean puedeModificar) {
+public boolean insertarPermisos(int idUsuario, boolean puedeMantenimiento, boolean puedeProcesos,
+                               boolean puedeEliminar, boolean puedeRegistrar, boolean puedeModificar,
+                               boolean[] permisosAplicaciones) {
     Connection conn = null;
     PreparedStatement ps = null;
     try {
         conn = Conexion.getConnection();
         String sql = "INSERT INTO permisos_usuario (id_usuario, puede_mantenimiento, puede_procesos, " +
-                     "puede_eliminar, puede_registrar, puede_modificar) VALUES (?, ?, ?, ?, ?, ?)";
+                     "puede_eliminar, puede_registrar, puede_modificar, " +
+                     "APL103, APL104, APL105, APL106, APL107, APL108, APL109, APL110, APL111, APL112) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         ps = conn.prepareStatement(sql);
         ps.setInt(1, idUsuario);
         ps.setBoolean(2, puedeMantenimiento);
@@ -283,6 +301,11 @@ public boolean insertarpermisos(int idUsuario, boolean puedeMantenimiento, boole
         ps.setBoolean(4, puedeEliminar);
         ps.setBoolean(5, puedeRegistrar);
         ps.setBoolean(6, puedeModificar);
+
+        // Asignación de permisos de aplicaciones
+        for (int i = 103; i <= 112; i++) {
+            ps.setBoolean(i - 97, permisosAplicaciones[i - 103]);
+        }
 
         int rows = ps.executeUpdate();
         return rows > 0;
@@ -368,11 +391,15 @@ public List<permisos> obtenerPermisos() {
     PreparedStatement ps = null;
     ResultSet rs = null;
     List<permisos> listaPermisos = new ArrayList<>();
+
     try {
         conn = Conexion.getConnection();
-        String sql = "SELECT id_usuario, puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar FROM permisos_usuario";
+        String sql = "SELECT id_usuario, puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar, " +
+                     "APL103, APL104, APL105, APL106, APL107, APL108, APL109, APL110, APL111, APL112 " +
+                     "FROM permisos_usuario";
         ps = conn.prepareStatement(sql);
         rs = ps.executeQuery();
+
         while (rs.next()) {
             permisos p = new permisos();
             p.setIdUsuario(rs.getInt("id_usuario"));
@@ -381,6 +408,12 @@ public List<permisos> obtenerPermisos() {
             p.setPuedeEliminar(rs.getBoolean("puede_eliminar"));
             p.setPuedeRegistrar(rs.getBoolean("puede_registrar"));
             p.setPuedeModificar(rs.getBoolean("puede_modificar"));
+
+            // Asignar permisos de aplicaciones dinámicamente
+            for (int i = 103; i <= 112; i++) {
+                p.setPermisoAplicacion(i, rs.getBoolean("APL" + i));
+            }
+
             listaPermisos.add(p);
         }
     } catch (SQLException e) {
@@ -391,8 +424,8 @@ public List<permisos> obtenerPermisos() {
         Conexion.close(conn);
     }
     return listaPermisos;
- }
-public List<Usuario> obtenerTodosLosUsuarios() {
+}
+public List<Usuario> obtenerUsuariosConPerfil() {
     List<Usuario> lista = new ArrayList<>();
     Connection conn = null;
     PreparedStatement stmt = null;
@@ -400,14 +433,22 @@ public List<Usuario> obtenerTodosLosUsuarios() {
 
     try {
         conn = Conexion.getConnection();
-        // Consulta SQL: tomar id_usuario y username tal cual
-        stmt = conn.prepareStatement("SELECT id_usuario, username FROM usuario");
+        // 🔥 Consulta SQL con `LEFT JOIN` para incluir usuarios sin perfil
+        String sql = "SELECT u.id_usuario, u.username, COALESCE(r.id_perfil, 'Sin perfil') AS perfil " +
+                     "FROM usuario u " +
+                     "LEFT JOIN relperfusu r ON u.id_usuario = r.id_usuario";
+        stmt = conn.prepareStatement(sql);
         rs = stmt.executeQuery();
 
         while (rs.next()) {
             Usuario u = new Usuario();
-            u.setId_usuario(rs.getInt("id_usuario"));  // Asignar id_usuario correctamente
-            u.setUsername(rs.getString("username"));   // Asignar username correctamente
+            u.setId_usuario(rs.getInt("id_usuario"));
+            u.setUsername(rs.getString("username"));
+            u.setPerfil(rs.getInt("id_perfil")); 
+ //  "Sin perfil"
+
+            System.out.println("ID: " + u.getId_usuario() + " | Nombre: " + u.getUsername() + " | Perfil: " + u.getPerfil()); // 🚀 Verifica si llega bien
+
             lista.add(u);
         }
     } catch (SQLException e) {
@@ -421,4 +462,7 @@ public List<Usuario> obtenerTodosLosUsuarios() {
     return lista;
 }
 
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

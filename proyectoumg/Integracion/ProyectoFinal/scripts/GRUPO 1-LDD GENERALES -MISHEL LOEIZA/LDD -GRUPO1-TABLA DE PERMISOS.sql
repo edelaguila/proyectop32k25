@@ -1,19 +1,23 @@
 CREATE TABLE permisos_usuario (
-   id_usuario int NOT NULL,
-   puede_mantenimiento tinyint(1) NOT NULL,
-   puede_procesos tinyint(1) NOT NULL,
-   puede_eliminar tinyint(1) DEFAULT '0',
-   puede_registrar tinyint(1) DEFAULT '0',
-   puede_modificar tinyint(1) DEFAULT '0',
-   PRIMARY KEY (id_usuario),
-   CONSTRAINT permisos_usuario_ibfk_1 FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario)
- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  id_usuario INT PRIMARY KEY,
+  puede_mantenimiento TINYINT(1) DEFAULT 0,
+  puede_procesos TINYINT(1) DEFAULT 0,
+  puede_eliminar TINYINT(1) DEFAULT 0,
+  puede_registrar TINYINT(1) DEFAULT 0,
+  puede_modificar TINYINT(1) DEFAULT 0,
+  APL103 TINYINT(1) DEFAULT 0,
+  APL104 TINYINT(1) DEFAULT 0,
+  APL105 TINYINT(1) DEFAULT 0,
+  APL106 TINYINT(1) DEFAULT 0,
+  APL107 TINYINT(1) DEFAULT 0,
+  APL108 TINYINT(1) DEFAULT 0,
+  APL109 TINYINT(1) DEFAULT 0,
+  APL110 TINYINT(1) DEFAULT 0,
+  APL111 TINYINT(1) DEFAULT 0,
+  APL112 TINYINT(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 //CAMBIAR POR ID QUE ESTEN EN SU BASE
-
- INSERT INTO permisos_usuario (
-  id_usuario, puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar
-) VALUES
-  (2034, 1, 1, 1, 1, 1),
-  (2038, 1, 0, 0, 1, 0),
-  (211, 0, 1, 0, 0, 1);
+INSERT INTO permisos_usuario (id_usuario, puede_mantenimiento, puede_procesos, puede_eliminar, puede_registrar, puede_modificar, APL103, APL104, APL105, APL106, APL107, APL108, APL109, APL110, APL111, APL112) 
+VALUES (2034, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);

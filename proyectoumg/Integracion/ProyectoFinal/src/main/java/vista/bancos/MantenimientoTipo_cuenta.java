@@ -147,7 +147,7 @@ private permisos permisosUsuarioActual;
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("MantenimientoTipo_Cuenta");
+        setTitle("104");
         setVisible(true);
 
         btnEliminar.setText("Eliminar");
