@@ -101,5 +101,27 @@ public productos getById(int idProducto) {
     }
     return producto;
 }
+
+// metodo implementado para manipular variable existencias --- sofia andrade
+public void actualizarExistencias(int proCodigo, int cantidadVendida) {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+
+    try {
+        conn = Conexion.getConnection();
+        String sql = "UPDATE tbl_productos SET proExistencias = proExistencias - ? WHERE proCodigo = ?";
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, cantidadVendida);
+        stmt.setInt(2, proCodigo);
+        stmt.executeUpdate();
+    } catch (SQLException ex) {
+        ex.printStackTrace(System.out);
+    } finally {
+        Conexion.close(stmt);
+        Conexion.close(conn);
+    }
+    // fin de metodo implementado para manipular variable existencias
+
+  }
 }
         
