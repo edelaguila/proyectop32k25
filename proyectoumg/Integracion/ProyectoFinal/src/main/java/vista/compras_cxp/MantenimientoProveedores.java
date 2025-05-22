@@ -1,5 +1,8 @@
+                                //Realizado por Andy Garcia 
+//Declaracion del paquete vista.compras
 package vista.compras_cxp;
 
+//Importaciones de los archivos a utilizar
 import Controlador.compras_cxp.Proveedor;
 import Modelo.compras_cxp.ProveedorDAO;
 import java.util.List;
@@ -7,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
 //Bitacora Implemenrada por Oscar Morales
 import Controlador.seguridad.Bitacora;
 import Controlador.seguridad.UsuarioConectado;
@@ -16,36 +20,58 @@ import Controlador.seguridad.UsuarioConectado;
  * @author visitante
  */
 
+//Declaracion de la clase mantenimiento proveedores
 public class MantenimientoProveedores extends javax.swing.JInternalFrame {
     
+    //Codigo de la aplicacion mantenimiento proveedores
     final int APLICACION=202;
-
+    
+    //Metodo para el llenado de los combo box de los proveedores que existen
     public void llenadoDeCombos() {
+        //Instancia de la clase proveedores
         ProveedorDAO proveedorDAO = new ProveedorDAO();
+        //Se obteiene la lista de los proveedores
         List<Proveedor> proveedores = proveedorDAO.select();
+        //Mensaje al usuario
         cbox_proveedor.addItem("Seleccione una opción");
+        //Ciclo que recorre y añade a cada proveedor al combo box
         for (int i = 0; i < proveedores.size(); i++) {
             cbox_proveedor.addItem(proveedores.get(i).getNombre_proveedor());
         }
     }
-
+    
+    //Metodo para el llenado de las tablas 
     public void llenadoDeTablas() {
+        //Nuevo modelo para la tabla
         DefaultTableModel modelo = new DefaultTableModel();
+        //Añadiendo columna del id del proveedor
         modelo.addColumn("Id ");
+        //Añadiendo columna el nombre del proveedor
         modelo.addColumn("Nombre ");
+        //Añadiendo columna de la dieccion del proveedor
         modelo.addColumn("Direccion ");
+        //Añadiendo columna del numero de telefono del proveedor
         modelo.addColumn("Telefono ");
+        //Añadiendo columna del id del email del proveedor
         modelo.addColumn("Email ");
+        //Añadiendo columna del saldo del proveedor
         modelo.addColumn("Saldo ");
+        //Añadiendo columna el estatus del proveedor
         modelo.addColumn("Estatus ");
+        //Añadiendo columna de la fecha de registro del proveedor
         modelo.addColumn("Fecha Registro");
+        //Añadiendo columna el plazo limite del proveedor
         modelo.addColumn("Plazo Limite");
        
-        
+        //Instancia de la clase proveedor
         ProveedorDAO proveedorDAO = new ProveedorDAO();
+        //Obteniendo la lista de los proveedores
         List<Proveedor> proveedores = proveedorDAO.select();
+        //Estableciendo el modelo en la tabla de vendedores
         tablaProveedores.setModel(modelo);
+        // Arreglo temporal para almacenar los datos de cada fila
         String[] dato = new String[9];
+        //Ciclo que recorre la lista obtenida  y agrega cada uno de los proveedores a la tabla
         for (int i = 0; i < proveedores.size(); i++) {
             dato[0] = Integer.toString(proveedores.get(i).getId_proveedor());
             dato[1] = proveedores.get(i).getNombre_proveedor();
@@ -56,17 +82,23 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
             dato[6] = Integer.toString(proveedores.get(i).getEstatus_proveedor());
             dato[7] = proveedores.get(i).getFecha_registro();
             dato[8] = Integer.toString(proveedores.get(i).getPlazo_limite());
+            //Agrega la fila al modelo
             modelo.addRow(dato);
         }
     }
-
-
+    
+    //Metodo para buscar un proveedor
     public void buscarProveedor() {
+        //Se crea una instancia de la clase proveedor y su dao
         Proveedor proveedorAConsultar = new Proveedor();
         ProveedorDAO proveedorDAO = new ProveedorDAO();
+        
+         // Se establece el ID del proveedor a consultar desde el campo de texto
         proveedorAConsultar.setId_proveedor(Integer.parseInt(txtbuscado.getText()));
+        // Se realiza la consulta en la base de datos
         proveedorAConsultar = proveedorDAO.query(proveedorAConsultar);
         
+        // Se llenan los campos con los datos del proveedor
         txtNombre.setText(proveedorAConsultar.getNombre_proveedor());
         txtDireccion.setText(proveedorAConsultar.getDireccion_proveedor());
         txtTelefono.setText(proveedorAConsultar.getTelefono_proveedor());
@@ -75,17 +107,21 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         txtEstatus.setText(String.valueOf(proveedorAConsultar.getEstatus_proveedor()));
         txtFechaRegistro.setText(proveedorAConsultar.getFecha_registro());
         txtlimite.setText(String.valueOf(proveedorAConsultar.getPlazo_limite()));
+        
+        //Se registra en la bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
-        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Consulta Datos Proveedores");
-        
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Consulta Datos Proveedores"); 
     }
        
-
+    // Constructor del formulario Mantenimiento Proveedores
     public MantenimientoProveedores() {
+        //inicializacion de los componentes graficos
         initComponents();
+        //Llamado al metodo de llenado de tablas
         llenadoDeTablas();
+        //Llamado al metodo de llenado de los combo box
         llenadoDeCombos();
     }
 
@@ -410,24 +446,35 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    //Boton eliminar
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        //Instancia de la clase proveedor y su dato
         ProveedorDAO proveedorDAO = new ProveedorDAO();
+        //Creacion de un objeto de la clase proveedor
         Proveedor proveedorAEliminar = new Proveedor();
+        
+        //Asignacion del id al proveedor que se desea eliminar
         proveedorAEliminar.setId_proveedor(Integer.parseInt(txtbuscado.getText()));
         proveedorDAO.delete(proveedorAEliminar);
+        //Llamado del llenado de tablas
         llenadoDeTablas();
+        
+        //Se registra en la bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Borrar Datos Proveedores");
     }//GEN-LAST:event_btnEliminarActionPerformed
 
-    
+    //Boton registrar
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+    //Instancia del proveedordao
     ProveedorDAO proveedorDAO = new ProveedorDAO();
+    //Se crea un objeto del proveedor
     Proveedor proveedorAInsertar = new Proveedor(); 
-    
+        
+        //Se asignan los valores de los campos de texto al objeto proveedor
         proveedorAInsertar.setNombre_proveedor(txtNombre.getText());
         proveedorAInsertar.setDireccion_proveedor(txtDireccion.getText());
         proveedorAInsertar.setTelefono_proveedor(txtTelefono.getText());
@@ -436,8 +483,11 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         proveedorAInsertar.setEstatus_proveedor(Integer.parseInt(txtEstatus.getText()));              
         proveedorAInsertar.setFecha_registro(txtFechaRegistro.getText());
         proveedorAInsertar.setPlazo_limite(Integer.parseInt(txtlimite.getText()));
+        
+        //Se inserta el proveedor
         proveedorDAO.insert(proveedorAInsertar);
         
+        //Se registra en la bitacora
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
         int resultadoBitacora=0;
         Bitacora bitacoraRegistro = new Bitacora();
@@ -445,18 +495,21 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         llenadoDeTablas();
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
-    
+    //Boton buscar
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+        //Llamado del metodo buscar un proveedor
         buscarProveedor();
     
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-//        // TODO add your handling code here:
+    
+        //Se creau na instancia del proveedordao 
         ProveedorDAO proveedorDAO = new ProveedorDAO();
+        //Se crea un objeto de la clase proveedor
         Proveedor proveedorAActualizar = new Proveedor();
         
+        //Se establecen los valores desde los campos del formulario
         proveedorAActualizar.setId_proveedor(Integer.parseInt(txtbuscado.getText()));
         proveedorAActualizar.setNombre_proveedor(txtNombre.getText());
         proveedorAActualizar.setDireccion_proveedor(txtDireccion.getText());
@@ -466,7 +519,9 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         proveedorAActualizar.setEstatus_proveedor(Integer.parseInt(txtEstatus.getText()));
         proveedorAActualizar.setFecha_registro(txtFechaRegistro.getText());
         proveedorAActualizar.setPlazo_limite(Integer.parseInt(txtlimite.getText()));
+        //Se actualizan los datos
         proveedorDAO.update(proveedorAActualizar);
+        //Se llama el metodo de llenado de las tablas
         llenadoDeTablas();
         
         UsuarioConectado usuarioEnSesion = new UsuarioConectado();
@@ -474,9 +529,12 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
         Bitacora bitacoraRegistro = new Bitacora();
         resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Actualizacion Datos Proveedores");
     }//GEN-LAST:event_btnModificarActionPerformed
-
+    
+    //Boton limpiar
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // Se restablece el ComboBox del proveedor al primer elemento
         cbox_proveedor.setSelectedIndex(0);
+        //Se limpia los datos de los campos
         txtNombre.setText("");
         txtDireccion.setText("");
         txtTelefono.setText("");
@@ -498,45 +556,69 @@ public class MantenimientoProveedores extends javax.swing.JInternalFrame {
 
         // TODO add your handling code here:
     }//GEN-LAST:event_cbox_proveedorActionPerformed
-    //Serie de funciones publicas para Seguridad. Hecho por Pablo Palencia
+    
+                //Serie de funciones publicas para Seguridad. Hecho por Pablo Palencia
     //Funciones publicas son llamadas cuando se crea la ventana para habilitar o desahibilitar botones
+    
+    //Se habilida el boton eliminar
     public void habilitarEliminar(boolean habilitado) {
         btnEliminar.setEnabled(habilitado);
     }
     
+    //Se habilita el boton registrar
     public void habilitarRegistrar(boolean habilitado) {
         btnRegistrar.setEnabled(habilitado);
     }
     
+    //Se habilita el boton buscar
     public void habilitarBuscar(boolean habilitado) {
         txtReporte.setEnabled(habilitado);
     }
     
+    //Se habilita el boton modificar
     public void habilitarModificar(boolean habilitado) {
         btnModificar.setEnabled(habilitado);
     }
     
+    //Boton reporte
     private void txtReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtReporteActionPerformed
-             ProveedorDAO proveedorDAO = new ProveedorDAO();
+        //Instancia del proveedordao
+        ProveedorDAO proveedorDAO = new ProveedorDAO();
+        //Se llama el metodo para imprimir un reporte
         proveedorDAO.imprimirReporte(); 
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Visualizar reporte Proveedores");
     }//GEN-LAST:event_txtReporteActionPerformed
-
+    
+    //Boton ayuda
+                         //Ayuda realizado por Andy Garcia
     private void txtAyudaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAyudaActionPerformed
- //ayuda implementada por Alisson López
+                        //ayuda implementada por Alisson López
        
         try {
+            //Verificacion si el archivo de ayuda existe
             if ((new File("src\\main\\java\\ayudas\\ayudasComprasyCuentasPorPagar.chm")).exists()) {
                 Process p = Runtime
                         .getRuntime()
                         .exec("rundll32 url.dll,FileProtocolHandler src\\main\\java\\ayudas\\ayudasComprasyCuentasPorPagar.chm");
                 p.waitFor();
             } else {
+                //Muestra mensaje en consola si no se encuentra el archivo de ayuda
                 System.out.println("La ayuda no Fue encontrada");
             }
             System.out.println("Correcto");
         } catch (Exception ex) {
+            // En caso de error, imprime la traza para diagnóstico
             ex.printStackTrace();
-        }  
+        } 
+        
+        UsuarioConectado usuarioEnSesion = new UsuarioConectado();
+        int resultadoBitacora=0;
+        Bitacora bitacoraRegistro = new Bitacora();
+        resultadoBitacora = bitacoraRegistro.setIngresarBitacora(usuarioEnSesion.getIdUsuario(), APLICACION,  "Gestion Ayuda Proveedores");
     }//GEN-LAST:event_txtAyudaActionPerformed
 
     

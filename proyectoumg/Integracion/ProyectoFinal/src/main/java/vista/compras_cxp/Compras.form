@@ -500,6 +500,9 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resulActionPerformed"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="resul.setEditable(false);"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
